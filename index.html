@@ -4,24 +4,157 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MapTaos</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      color: #222;
+    }
+
+    .app {
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+      margin-top: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 24px;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      margin-bottom: 12px;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 12px;
+      font-size: 17px;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: #1f7a5c;
+      color: white;
+      font-weight: bold;
+    }
+
+    .btn-result {
+      background: #111;
+      color: white;
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .section-title {
+      margin-top: 10px;
+      margin-bottom: 8px;
+    }
+
+    .ranking-placeholder {
+      background: #eef1f3;
+      border-radius: 12px;
+      padding: 16px;
+      color: #666;
+      text-align: center;
+    }
+
+    .small {
+      font-size: 14px;
+      color: #666;
+      text-align: center;
+      margin-top: 14px;
+    }
+  </style>
 </head>
 
 <body>
 
-  <main>
-    <h1>🌍 MapTaos</h1>
+  <div class="app">
 
-    <p>Peña MapTaos</p>
+    <!-- LOGIN -->
+    <section id="loginView">
+      <div class="card">
+        <h1>🌍 MapTaos</h1>
+        <p class="subtitle">Acceso a la peña</p>
 
-    <button id="pegarResultado">
-      📋 Pegar resultado
-    </button>
+        <input
+          type="email"
+          id="email"
+          placeholder="Correo electrónico"
+        >
 
-    <section>
-      <h2>Clasificación de hoy</h2>
-      <p>Próximamente...</p>
+        <input
+          type="password"
+          id="password"
+          placeholder="Contraseña"
+        >
+
+        <button class="btn-primary" id="loginButton">
+          Entrar
+        </button>
+
+        <p class="small">
+          Acceso reservado a miembros autorizados.
+        </p>
+      </div>
     </section>
-  </main>
+
+
+    <!-- APP -->
+    <section id="appView" class="hidden">
+
+      <h1>🌍 MapTaos</h1>
+      <p class="subtitle">Peña MapTaos</p>
+
+      <button class="btn-result" id="pasteResultButton">
+        📋 Pegar resultado
+      </button>
+
+      <div class="card">
+        <h2 class="section-title">Clasificación de hoy</h2>
+
+        <div class="ranking-placeholder">
+          Próximamente se cargarán aquí los resultados.
+        </div>
+      </div>
+
+    </section>
+
+  </div>
 
 </body>
 </html>
