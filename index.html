@@ -133,7 +133,6 @@
       </div>
     </section>
 
-
     <!-- APP -->
     <section id="appView" class="hidden">
 
@@ -155,6 +154,80 @@
     </section>
 
   </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    const SUPABASE_URL =
+      "https://oktfgwieowixtoxbdbmg.supabase.co";
+
+    const SUPABASE_KEY =
+      "sb_publishable_9LLVrCKy2_fl_vzouJGTfQ_h22GzOGi";
+
+    const supabaseClient =
+      supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const loginView = document.getElementById("loginView");
+    const appView = document.getElementById("appView");
+    const loginButton = document.getElementById("loginButton");
+
+    function mostrarApp() {
+      loginView.classList.add("hidden");
+      appView.classList.remove("hidden");
+    }
+
+    function mostrarLogin() {
+      appView.classList.add("hidden");
+      loginView.classList.remove("hidden");
+    }
+
+    loginButton.addEventListener("click", async () => {
+
+      const email =
+        document.getElementById("email").value.trim();
+
+      const password =
+        document.getElementById("password").value;
+
+      if (!email || !password) {
+        alert("Introduce correo y contraseña.");
+        return;
+      }
+
+      loginButton.disabled = true;
+      loginButton.textContent = "Entrando...";
+
+      const { data, error } =
+        await supabaseClient.auth.signInWithPassword({
+          email: email,
+          password: password
+        });
+
+      loginButton.disabled = false;
+      loginButton.textContent = "Entrar";
+
+      if (error) {
+        alert("No se ha podido iniciar sesión.");
+        return;
+      }
+
+      mostrarApp();
+    });
+
+    async function comprobarSesion() {
+
+      const { data } =
+        await supabaseClient.auth.getSession();
+
+      if (data.session) {
+        mostrarApp();
+      } else {
+        mostrarLogin();
+      }
+    }
+
+    comprobarSesion();
+  </script>
 
 </body>
 </html>
