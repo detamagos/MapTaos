@@ -791,9 +791,93 @@ function limpiarMensaje() {
 }
 
 
+async function cargarRankingHoy() {
+
+  const rankingHoy =
+    document.getElementById("rankingHoy");
+
+  const hoy =
+    new Date()
+      .toISOString()
+      .slice(0, 10);
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("ranking_diario")
+      .select(
+        "fecha, jugador_id, nombre, final_score, posicion"
+      )
+      .eq("fecha", hoy)
+      .order("posicion", {
+        ascending: true
+      });
+
+  if (error) {
+
+    rankingHoy.innerHTML =
+      "No se pudo cargar la clasificación.";
+
+    return;
+  }
+
+  if (!data || data.length === 0) {
+
+    rankingHoy.innerHTML =
+      "Todavía no hay resultados hoy.";
+
+    return;
+  }
+
+  rankingHoy.innerHTML =
+    data.map(fila => {
+
+      let medalla = "";
+
+      if (fila.posicion === 1) {
+        medalla = "🥇";
+      }
+      else if (fila.posicion === 2) {
+        medalla = "🥈";
+      }
+      else if (fila.posicion === 3) {
+        medalla = "🥉";
+      }
+
+      return `
+        <div style="
+          display:flex;
+          justify-content:space-between;
+          align-items:center;
+          padding:10px 0;
+          border-bottom:1px solid #ddd;
+        ">
+          <span>
+            ${medalla}
+            ${fila.posicion}.
+            <strong>${fila.nombre}</strong>
+          </span>
+
+          <strong>
+            ${fila.final_score}
+          </strong>
+        </div>
+      `;
+
+    }).join("");
+}
+
+
 async function iniciarApp() {
+
   mostrarApp();
+
   await cargarJugador();
+
+  await cargarRankingHoy();
+
 }
 
 
