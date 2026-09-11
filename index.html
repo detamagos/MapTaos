@@ -29,7 +29,7 @@
       border-radius: 18px;
       padding: 22px;
       box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-      margin-top: 20px;
+      margin-top: 18px;
     }
 
     h1 {
@@ -40,7 +40,7 @@
     .subtitle {
       text-align: center;
       color: #666;
-      margin-bottom: 24px;
+      margin-bottom: 16px;
     }
 
     input,
@@ -77,9 +77,9 @@
     .btn-result {
       background: #111;
       color: white;
-      font-size: 20px;
+      font-size: 21px;
       font-weight: bold;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
 
     .btn-secondary {
@@ -102,7 +102,8 @@
     .player {
       text-align: center;
       font-weight: bold;
-      margin-bottom: 18px;
+      font-size: 18px;
+      margin-bottom: 22px;
     }
 
     .detected-score {
@@ -132,6 +133,19 @@
       border-radius: 12px;
       text-align: center;
       margin-top: 15px;
+    }
+
+    .home-section-title {
+      margin: 0 0 12px;
+      font-size: 20px;
+    }
+
+    .placeholder {
+      background: #eef1f3;
+      border-radius: 12px;
+      padding: 16px;
+      color: #666;
+      text-align: center;
     }
   </style>
 </head>
@@ -185,8 +199,7 @@
     <div
       class="player"
       id="playerName"
-    >
-    </div>
+    ></div>
 
     <button
       class="btn-result"
@@ -195,23 +208,21 @@
       📋 Pegar resultado
     </button>
 
-    <button
-      class="btn-secondary"
-      id="manualButton"
-    >
-      Escribir / pegar manualmente
-    </button>
 
-
-    <!-- PEGADO MANUAL -->
+    <!-- PEGADO MANUAL DE RESPALDO -->
     <div
       class="card hidden"
       id="manualCard"
     >
 
+      <p class="small">
+        Chrome no pudo leer el portapapeles automáticamente.
+        Pega aquí el resultado de MapTap.
+      </p>
+
       <textarea
         id="manualText"
-        placeholder="Pega aquí el resultado de MapTap..."
+        placeholder="Pega aquí el resultado..."
       ></textarea>
 
       <button
@@ -237,14 +248,12 @@
       <div
         class="detected-score"
         id="detectedScore"
-      >
-      </div>
+      ></div>
 
       <div
         class="detected-date"
         id="detectedDate"
-      >
-      </div>
+      ></div>
 
       <button
         class="btn-primary"
@@ -262,7 +271,19 @@
 
     </div>
 
+
     <div id="messageBox"></div>
+
+
+    <div class="card">
+      <h2 class="home-section-title">
+        Clasificación de hoy
+      </h2>
+
+      <div class="placeholder">
+        Próximamente se mostrarán aquí los resultados del día.
+      </div>
+    </div>
 
   </section>
 
@@ -285,14 +306,8 @@ const supabaseClient =
     SUPABASE_KEY
   );
 
-
 let jugadorActual = null;
 let resultadoPendiente = null;
-
-
-/* =========================
-   ELEMENTOS
-========================= */
 
 const loginView =
   document.getElementById("loginView");
@@ -305,9 +320,6 @@ const loginButton =
 
 const pasteResultButton =
   document.getElementById("pasteResultButton");
-
-const manualButton =
-  document.getElementById("manualButton");
 
 const manualCard =
   document.getElementById("manualCard");
@@ -340,23 +352,14 @@ const messageBox =
   document.getElementById("messageBox");
 
 
-/* =========================
-   LOGIN
-========================= */
-
 function mostrarLogin() {
-
   loginView.classList.remove("hidden");
   appView.classList.add("hidden");
-
 }
 
-
 function mostrarApp() {
-
   loginView.classList.add("hidden");
   appView.classList.remove("hidden");
-
 }
 
 
@@ -365,67 +368,43 @@ loginButton.addEventListener(
   async () => {
 
     const email =
-      document
-        .getElementById("email")
-        .value
-        .trim();
+      document.getElementById("email").value.trim();
 
     const password =
-      document
-        .getElementById("password")
-        .value;
+      document.getElementById("password").value;
 
     if (!email || !password) {
-
-      alert(
-        "Introduce correo y contraseña."
-      );
-
+      alert("Introduce correo y contraseña.");
       return;
     }
 
     loginButton.disabled = true;
-    loginButton.textContent =
-      "Entrando...";
+    loginButton.textContent = "Entrando...";
 
     const { error } =
-      await supabaseClient.auth
-        .signInWithPassword({
-          email,
-          password
-        });
+      await supabaseClient.auth.signInWithPassword({
+        email,
+        password
+      });
 
     loginButton.disabled = false;
-    loginButton.textContent =
-      "Entrar";
+    loginButton.textContent = "Entrar";
 
     if (error) {
-
-      alert(
-        "No se ha podido iniciar sesión."
-      );
-
+      alert("No se ha podido iniciar sesión.");
       return;
     }
 
     await iniciarApp();
-
   }
 );
 
 
-/* =========================
-   JUGADOR ACTUAL
-========================= */
-
 async function cargarJugador() {
 
   const {
-    data: {
-      user
-    }
-  } =
-    await supabaseClient.auth.getUser();
+    data: { user }
+  } = await supabaseClient.auth.getUser();
 
   if (!user) {
     return false;
@@ -438,19 +417,14 @@ async function cargarJugador() {
     await supabaseClient
       .from("jugadores")
       .select("id, nombre, activo")
-      .eq(
-        "auth_user_id",
-        user.id
-      )
+      .eq("auth_user_id", user.id)
       .single();
 
   if (error || !data) {
-
     mostrarMensaje(
       "Tu cuenta no está vinculada a ningún jugador.",
       "error"
     );
-
     return false;
   }
 
@@ -460,13 +434,8 @@ async function cargarJugador() {
     "👤 " + data.nombre;
 
   return true;
-
 }
 
-
-/* =========================
-   LEER RESULTADO MAPTAP
-========================= */
 
 function analizarResultado(texto) {
 
@@ -481,14 +450,12 @@ function analizarResultado(texto) {
     );
 
   if (!scoreMatch) {
-
     throw new Error(
       "No se encontró el Final Score."
     );
   }
 
   if (!fechaMatch) {
-
     throw new Error(
       "No se encontró la fecha."
     );
@@ -502,7 +469,6 @@ function analizarResultado(texto) {
     score < 0 ||
     score > 1000
   ) {
-
     throw new Error(
       "El Final Score no es válido."
     );
@@ -533,7 +499,6 @@ function analizarResultado(texto) {
     meses[mesTexto];
 
   if (mes === undefined) {
-
     throw new Error(
       "El mes no es válido."
     );
@@ -555,44 +520,22 @@ function analizarResultado(texto) {
       0
     );
 
-  /*
-    Si estamos a principios de año
-    y se pega un resultado de diciembre,
-    interpretamos que pertenece
-    al año anterior.
-  */
-
   const diferenciaDias =
     (
       fecha.getTime() -
       hoy.getTime()
-    )
-    /
-    86400000;
+    ) / 86400000;
 
   if (diferenciaDias > 30) {
-
     año = año - 1;
-
-    fecha =
-      new Date(
-        año,
-        mes,
-        dia,
-        12,
-        0,
-        0
-      );
   }
 
   const fechaSQL =
     año
     + "-"
-    + String(mes + 1)
-      .padStart(2, "0")
+    + String(mes + 1).padStart(2, "0")
     + "-"
-    + String(dia)
-      .padStart(2, "0");
+    + String(dia).padStart(2, "0");
 
   return {
     score,
@@ -600,20 +543,14 @@ function analizarResultado(texto) {
     fechaVisible:
       dia
       + "/"
-      + String(mes + 1)
-        .padStart(2, "0")
+      + String(mes + 1).padStart(2, "0")
       + "/"
       + año,
     textoOriginal:
       texto
   };
-
 }
 
-
-/* =========================
-   MOSTRAR CONFIRMACIÓN
-========================= */
 
 function prepararResultado(texto) {
 
@@ -648,15 +585,9 @@ function prepararResultado(texto) {
       error.message,
       "error"
     );
-
   }
-
 }
 
-
-/* =========================
-   PORTAPAPELES
-========================= */
 
 pasteResultButton.addEventListener(
   "click",
@@ -667,11 +598,9 @@ pasteResultButton.addEventListener(
     try {
 
       const texto =
-        await navigator.clipboard
-          .readText();
+        await navigator.clipboard.readText();
 
       if (!texto.trim()) {
-
         throw new Error(
           "El portapapeles está vacío."
         );
@@ -687,28 +616,10 @@ pasteResultButton.addEventListener(
         .remove("hidden");
 
       mostrarMensaje(
-        "Chrome no permitió leer automáticamente el portapapeles. Pega el resultado en el cuadro.",
+        "No se pudo leer automáticamente el portapapeles.",
         "error"
       );
-
     }
-
-  }
-);
-
-
-/* =========================
-   PEGADO MANUAL
-========================= */
-
-manualButton.addEventListener(
-  "click",
-  () => {
-
-    manualCard
-      .classList
-      .toggle("hidden");
-
   }
 );
 
@@ -731,14 +642,9 @@ analyzeManualButton.addEventListener(
     }
 
     prepararResultado(texto);
-
   }
 );
 
-
-/* =========================
-   GUARDAR RESULTADO
-========================= */
 
 saveResultButton.addEventListener(
   "click",
@@ -755,21 +661,13 @@ saveResultButton.addEventListener(
     saveResultButton.textContent =
       "Guardando...";
 
-    /*
-      Comprobamos primero si ya existe
-      un resultado de ese jugador
-      en esa fecha.
-    */
-
     const {
       data: existente,
       error: errorConsulta
     } =
       await supabaseClient
         .from("resultados")
-        .select(
-          "id, final_score"
-        )
+        .select("id, final_score")
         .eq(
           "jugador_id",
           jugadorActual.id
@@ -814,21 +712,16 @@ saveResultButton.addEventListener(
       return;
     }
 
-    const {
-      error
-    } =
+    const { error } =
       await supabaseClient
         .from("resultados")
         .insert({
           jugador_id:
             jugadorActual.id,
-
           fecha:
             resultadoPendiente.fechaSQL,
-
           final_score:
             resultadoPendiente.score,
-
           texto_original:
             resultadoPendiente.textoOriginal
         });
@@ -861,14 +754,9 @@ saveResultButton.addEventListener(
     );
 
     resultadoPendiente = null;
-
   }
 );
 
-
-/* =========================
-   CANCELAR
-========================= */
 
 cancelButton.addEventListener(
   "click",
@@ -879,14 +767,9 @@ cancelButton.addEventListener(
     confirmationCard
       .classList
       .add("hidden");
-
   }
 );
 
-
-/* =========================
-   MENSAJES
-========================= */
 
 function mostrarMensaje(
   texto,
@@ -899,51 +782,32 @@ function mostrarMensaje(
     + '">'
     + texto
     + '</div>';
-
 }
 
 
 function limpiarMensaje() {
-
   messageBox.innerHTML = "";
-
 }
 
 
-/* =========================
-   ARRANQUE
-========================= */
-
 async function iniciarApp() {
-
   mostrarApp();
-
   await cargarJugador();
-
 }
 
 
 async function comprobarSesion() {
 
-  const {
-    data
-  } =
-    await supabaseClient.auth
-      .getSession();
+  const { data } =
+    await supabaseClient.auth.getSession();
 
   if (data.session) {
-
     await iniciarApp();
-
   }
   else {
-
     mostrarLogin();
-
   }
-
 }
-
 
 comprobarSesion();
 
