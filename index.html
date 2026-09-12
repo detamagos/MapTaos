@@ -444,7 +444,35 @@ function analizarResultado(texto) {
     texto.match(
       /Final score:\s*(\d+)/i
     );
+const lineaRondas =
+  texto
+    .split("\n")
+    .find(linea =>
+      !/www\.maptap\.gg/i.test(linea) &&
+      !/Final score:/i.test(linea) &&
+      /\d/.test(linea)
+    );
 
+if (!lineaRondas) {
+  throw new Error(
+    "No se encontraron las 5 rondas."
+  );
+}
+
+const puntuaciones =
+  [...lineaRondas.matchAll(/(\d{1,3})/g)]
+    .map(resultado => Number(resultado[1]));
+
+if (
+  puntuaciones.length !== 5 ||
+  puntuaciones.some(
+    puntos => puntos < 0 || puntos > 100
+  )
+) {
+  throw new Error(
+    "No se pudieron interpretar las 5 rondas."
+  );
+}
   const fechaMatch =
     texto.match(
       /www\.maptap\.gg\s+([A-Za-z]+)\s+(\d{1,2})/i
@@ -539,17 +567,24 @@ function analizarResultado(texto) {
     + String(dia).padStart(2, "0");
 
   return {
-    score,
-    fechaSQL,
-    fechaVisible:
-      dia
-      + "/"
-      + String(mes + 1).padStart(2, "0")
-      + "/"
-      + año,
-    textoOriginal:
-      texto
-  };
+  score,
+  fechaSQL,
+  fechaVisible:
+    dia
+    + "/"
+    + String(mes + 1).padStart(2, "0")
+    + "/"
+    + año,
+
+  ronda1: puntuaciones[0],
+  ronda2: puntuaciones[1],
+  ronda3: puntuaciones[2],
+  ronda4: puntuaciones[3],
+  ronda5: puntuaciones[4],
+
+  textoOriginal:
+    texto
+};
 }
 
 
@@ -716,16 +751,19 @@ saveResultButton.addEventListener(
     const { error } =
       await supabaseClient
         .from("resultados")
-        .insert({
-          jugador_id:
-            jugadorActual.id,
-          fecha:
-            resultadoPendiente.fechaSQL,
-          final_score:
-            resultadoPendiente.score,
-          texto_original:
-            resultadoPendiente.textoOriginal
-        });
+    .insert({
+  jugador_id: jugadorActual.id,
+  fecha: resultadoPendiente.fechaSQL,
+  final_score: resultadoPendiente.score,
+
+  ronda_1: resultadoPendiente.ronda1,
+  ronda_2: resultadoPendiente.ronda2,
+  ronda_3: resultadoPendiente.ronda3,
+  ronda_4: resultadoPendiente.ronda4,
+  ronda_5: resultadoPendiente.ronda5,
+
+  texto_original: resultadoPendiente.textoOriginal
+});
 
     saveResultButton.disabled = false;
     saveResultButton.textContent =
