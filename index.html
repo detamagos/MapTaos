@@ -859,7 +859,10 @@ async function cargarRankingHoy() {
   const rankingHoy =
     document.getElementById("rankingHoy");
 
-  const hoy = "2026-09-06";
+  const hoy =
+  new Date()
+    .toISOString()
+    .slice(0, 10);
 
   const {
     data,
