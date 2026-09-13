@@ -893,7 +893,28 @@ async function cargarRankingHoy() {
 
     return;
   }
+const {
+  data: parciales,
+  error: errorParciales
+} =
+  await supabaseClient
+    .from("resultados")
+    .select(
+      "jugador_id, ronda_1, ronda_2, ronda_3, ronda_4, ronda_5"
+    )
+    .eq("fecha", hoy);
 
+const {
+  data: rondasDia
+} =
+  await supabaseClient
+    .from("rondas_dia")
+    .select(
+      "pais_1, pais_2, pais_3, pais_4, pais_5"
+    )
+    .eq("fecha", hoy)
+    .maybeSingle();
+  
   rankingHoy.innerHTML =
     data.map(fila => {
 
@@ -908,26 +929,90 @@ async function cargarRankingHoy() {
       else if (fila.posicion === 3) {
         medalla = "🥉";
       }
+const parcialJugador =
+  parciales?.find(
+    p => p.jugador_id === fila.jugador_id
+  );
 
+let textoRondas = "";
+
+if (parcialJugador) {
+
+  const puntos = [
+    parcialJugador.ronda_1,
+    parcialJugador.ronda_2,
+    parcialJugador.ronda_3,
+    parcialJugador.ronda_4,
+    parcialJugador.ronda_5
+  ];
+
+  const banderas = rondasDia
+    ? [
+        rondasDia.pais_1,
+        rondasDia.pais_2,
+        rondasDia.pais_3,
+        rondasDia.pais_4,
+        rondasDia.pais_5
+      ]
+    : [];
+
+  textoRondas =
+    puntos
+      .map((puntosRonda, i) => {
+
+        if (puntosRonda === null) {
+          return "";
+        }
+
+        const bandera =
+          banderas[i] || "";
+
+        return bandera
+          ? `${bandera} ${puntosRonda}`
+          : `${puntosRonda}`;
+      })
+      .filter(Boolean)
+      .join(" · ");
+           }
+      
       return `
-        <div style="
-          display:flex;
-          justify-content:space-between;
-          align-items:center;
-          padding:10px 0;
-          border-bottom:1px solid #ddd;
-        ">
-          <span>
-            ${medalla}
-            ${fila.posicion}.
-            <strong>${fila.nombre}</strong>
-          </span>
+  <div style="
+    padding:10px 0;
+    border-bottom:1px solid #ddd;
+  ">
 
-          <strong>
-            ${fila.final_score}
-          </strong>
-        </div>
-      `;
+    <div style="
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    ">
+      <span>
+        ${medalla}
+        ${fila.posicion}.
+        <strong>${fila.nombre}</strong>
+      </span>
+
+      <strong>
+        ${fila.final_score}
+      </strong>
+    </div>
+
+    ${
+      textoRondas
+        ? `
+          <div style="
+            margin-top:6px;
+            font-size:14px;
+            color:#666;
+          ">
+            ${textoRondas}
+          </div>
+        `
+        : ""
+    }
+
+  </div>
+`;
 
     }).join("");
 }
