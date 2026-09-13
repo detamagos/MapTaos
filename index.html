@@ -279,7 +279,17 @@
       <h2 class="home-section-title">
         Clasificación de hoy
       </h2>
+      
+<div class="card">
+  <h2 class="home-section-title">
+    Clasificación semanal
+  </h2>
 
+  <div id="rankingSemanal" class="placeholder">
+    Cargando clasificación semanal...
+  </div>
+</div>
+      
       <div id="rankingHoy"
       class="placeholder">
         Cargando clasificación...
@@ -1064,7 +1074,184 @@ if (filaAyer) {
 
     }).join("");
 }
+async function cargarRankingSemanal() {
 
+  const rankingSemanal =
+    document.getElementById("rankingSemanal");
+
+  const hoy = new Date();
+
+  const diaSemana =
+    hoy.getDay() === 0 ? 7 : hoy.getDay();
+
+  const lunesActual =
+    new Date(hoy);
+
+  lunesActual.setDate(
+    hoy.getDate() - diaSemana + 1
+  );
+
+  const lunesAnterior =
+    new Date(lunesActual);
+
+  lunesAnterior.setDate(
+    lunesActual.getDate() - 7
+  );
+
+  const fechaSemanaActual =
+    lunesActual
+      .toISOString()
+      .slice(0, 10);
+
+  const fechaSemanaAnterior =
+    lunesAnterior
+      .toISOString()
+      .slice(0, 10);
+
+
+  const {
+    data: actual,
+    error: errorActual
+  } =
+    await supabaseClient
+      .from("ranking_semanal")
+      .select(
+        "inicio_semana, jugador_id, nombre, puntos, dias_jugados, posicion"
+      )
+      .eq(
+        "inicio_semana",
+        fechaSemanaActual
+      )
+      .order(
+        "posicion",
+        { ascending: true }
+      );
+
+
+  const {
+    data: anterior,
+    error: errorAnterior
+  } =
+    await supabaseClient
+      .from("ranking_semanal")
+      .select(
+        "inicio_semana, jugador_id, nombre, puntos, dias_jugados, posicion"
+      )
+      .eq(
+        "inicio_semana",
+        fechaSemanaAnterior
+      )
+      .order(
+        "posicion",
+        { ascending: true }
+      );
+
+
+  if (errorActual) {
+
+    rankingSemanal.innerHTML =
+      "No se pudo cargar la clasificación semanal.";
+
+    return;
+  }
+
+
+  if (!actual || actual.length === 0) {
+
+    rankingSemanal.innerHTML =
+      "Todavía no hay resultados esta semana.";
+
+    return;
+  }
+
+
+  rankingSemanal.innerHTML =
+    actual.map(fila => {
+
+      let medalla = "";
+
+      if (fila.posicion === 1) {
+        medalla = "🥇";
+      }
+      else if (fila.posicion === 2) {
+        medalla = "🥈";
+      }
+      else if (fila.posicion === 3) {
+        medalla = "🥉";
+      }
+
+
+      const filaAnterior =
+        anterior?.find(
+          anteriorFila =>
+            anteriorFila.jugador_id === fila.jugador_id
+        );
+
+
+      let movimiento = "🆕";
+
+      if (filaAnterior) {
+
+        const diferencia =
+          filaAnterior.posicion - fila.posicion;
+
+        if (diferencia > 0) {
+          movimiento = `↑${diferencia}`;
+        }
+        else if (diferencia < 0) {
+          movimiento = `↓${Math.abs(diferencia)}`;
+        }
+        else {
+          movimiento = "=";
+        }
+      }
+
+
+      return `
+        <div style="
+          padding:10px 0;
+          border-bottom:1px solid #ddd;
+        ">
+
+          <div style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+          ">
+
+            <span>
+              ${medalla}
+              ${fila.posicion}.
+              <strong>${fila.nombre}</strong>
+
+              <span style="
+                margin-left:6px;
+                font-size:13px;
+              ">
+                ${movimiento}
+              </span>
+            </span>
+
+            <strong>
+              ${fila.puntos}
+            </strong>
+
+          </div>
+
+          <div style="
+            margin-top:5px;
+            font-size:13px;
+            color:#666;
+          ">
+            ${fila.dias_jugados}
+            ${fila.dias_jugados === 1 ? "día jugado" : "días jugados"}
+          </div>
+
+        </div>
+      `;
+
+    }).join("");
+            }
 
 async function iniciarApp() {
 
@@ -1073,6 +1260,8 @@ async function iniciarApp() {
   await cargarJugador();
 
   await cargarRankingHoy();
+
+  await cargarRankingSemanal();
 
 }
 
