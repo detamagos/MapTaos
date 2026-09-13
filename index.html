@@ -863,7 +863,14 @@ async function cargarRankingHoy() {
   new Date()
     .toISOString()
     .slice(0, 10);
+const fechaAyer = new Date();
+fechaAyer.setDate(fechaAyer.getDate() - 1);
 
+const ayer =
+  fechaAyer
+    .toISOString()
+    .slice(0, 10);
+  
   const {
     data,
     error
@@ -877,7 +884,20 @@ async function cargarRankingHoy() {
       .order("posicion", {
         ascending: true
       });
-
+const {
+  data: dataAyer,
+  error: errorAyer
+} =
+  await supabaseClient
+    .from("ranking_diario")
+    .select(
+      "fecha, jugador_id, nombre, final_score, posicion"
+    )
+    .eq("fecha", ayer)
+    .order("posicion", {
+      ascending: true
+    });
+  
   if (error) {
 
     rankingHoy.innerHTML =
@@ -974,7 +994,29 @@ if (parcialJugador) {
       .filter(Boolean)
       .join(" · ");
            }
-      
+      const filaAyer =
+  dataAyer?.find(
+    anterior =>
+      anterior.jugador_id === fila.jugador_id
+  );
+
+let movimiento = "🆕";
+
+if (filaAyer) {
+
+  const diferencia =
+    filaAyer.posicion - fila.posicion;
+
+  if (diferencia > 0) {
+    movimiento = `↑${diferencia}`;
+  }
+  else if (diferencia < 0) {
+    movimiento = `↓${Math.abs(diferencia)}`;
+  }
+  else {
+    movimiento = "—";
+  }
+}
       return `
   <div style="
     padding:10px 0;
@@ -989,7 +1031,13 @@ if (parcialJugador) {
       <span>
         ${medalla}
         ${fila.posicion}.
-        <strong>${fila.nombre}</strong>
+<strong>${fila.nombre}</strong>
+<span style="
+  margin-left:6px;
+  font-size:13px;
+">
+  ${movimiento}
+</span>
       </span>
 
       <strong>
