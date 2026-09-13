@@ -862,16 +862,33 @@ function limpiarMensaje() {
   messageBox.innerHTML = "";
 }
 
+ function fechaMadridISO(fecha = new Date()) {
+  const partes =
+    new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Europe/Madrid",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    }).formatToParts(fecha);
+
+  const valores = {};
+
+  for (const parte of partes) {
+    if (parte.type !== "literal") {
+      valores[parte.type] = parte.value;
+    }
+  }
+
+  return `${valores.year}-${valores.month}-${valores.day}`;
+ } 
 
 async function cargarRankingHoy() {
 
   const rankingHoy =
     document.getElementById("rankingHoy");
 
-  const hoy =
-  new Date()
-    .toISOString()
-    .slice(0, 10);
+  const hoy = fechaMadridISO();
+  
 const fechaAyer = new Date();
 fechaAyer.setDate(fechaAyer.getDate() - 1);
 
@@ -1079,23 +1096,34 @@ async function cargarRankingSemanal() {
     document.getElementById("rankingSemanal");
 
   const hoy = new Date();
+const fechaMadrid = fechaMadridISO();
 
-  const diaSemana =
-    hoy.getDay() === 0 ? 7 : hoy.getDay();
+const [anio, mes, dia] =
+  fechaMadrid.split("-").map(Number);
 
-  const lunesActual =
-    new Date(hoy);
+// Usamos UTC internamente solo para hacer
+// cálculos de calendario sin depender del móvil
+const hoyMadrid =
+  new Date(Date.UTC(anio, mes - 1, dia));
 
-  lunesActual.setDate(
-    hoy.getDate() - diaSemana + 1
-  );
+const diaSemana =
+  hoyMadrid.getUTCDay() === 0
+    ? 7
+    : hoyMadrid.getUTCDay();
 
-  const lunesAnterior =
-    new Date(lunesActual);
+const lunesActual =
+  new Date(hoyMadrid);
 
-  lunesAnterior.setDate(
-    lunesActual.getDate() - 7
-  );
+lunesActual.setUTCDate(
+  hoyMadrid.getUTCDate() - diaSemana + 1
+);
+
+const lunesAnterior =
+  new Date(lunesActual);
+
+lunesAnterior.setUTCDate(
+  lunesActual.getUTCDate() - 7
+);
 
   const fechaSemanaActual =
     lunesActual
