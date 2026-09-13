@@ -473,6 +473,11 @@ if (
     "No se pudieron interpretar las 5 rondas."
   );
 }
+  const banderas =
+  [...lineaRondas.matchAll(/([\p{Regional_Indicator}]{2})\s*\d{1,3}/gu)]
+    .map(resultado => resultado[1]);
+
+const tieneBanderas = banderas.length === 5;
   const fechaMatch =
     texto.match(
       /www\.maptap\.gg\s+([A-Za-z]+)\s+(\d{1,2})/i
@@ -581,7 +586,8 @@ if (
   ronda3: puntuaciones[2],
   ronda4: puntuaciones[3],
   ronda5: puntuaciones[4],
-
+tieneBanderas,
+banderas,
   textoOriginal:
     texto
 };
@@ -778,7 +784,25 @@ saveResultButton.addEventListener(
 
       return;
     }
+if (resultadoPendiente.tieneBanderas) {
 
+  await supabaseClient
+    .from("rondas_dia")
+    .upsert(
+      {
+        fecha: resultadoPendiente.fechaSQL,
+        pais_1: resultadoPendiente.banderas[0],
+        pais_2: resultadoPendiente.banderas[1],
+        pais_3: resultadoPendiente.banderas[2],
+        pais_4: resultadoPendiente.banderas[3],
+        pais_5: resultadoPendiente.banderas[4]
+      },
+      {
+        onConflict: "fecha",
+        ignoreDuplicates: true
+      }
+    );
+}
     confirmationCard
       .classList
       .add("hidden");
