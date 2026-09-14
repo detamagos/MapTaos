@@ -901,13 +901,7 @@ async function cargarRankingHoy() {
 
   const hoy = fechaMadridISO();
   
-const fechaAyer = new Date();
-fechaAyer.setDate(fechaAyer.getDate() - 1);
 
-const ayer =
-  fechaAyer
-    .toISOString()
-    .slice(0, 10);
   
   const {
     data,
@@ -922,18 +916,19 @@ const ayer =
       .order("posicion", {
         ascending: true
       });
-const {
-  data: dataAyer,
-  error: errorAyer
+
+  const {
+  data: historialAnterior,
+  error: errorHistorial
 } =
   await supabaseClient
     .from("ranking_diario")
     .select(
       "fecha, jugador_id, nombre, final_score, posicion"
     )
-    .eq("fecha", ayer)
-    .order("posicion", {
-      ascending: true
+    .lt("fecha", hoy)
+    .order("fecha", {
+      ascending: false
     });
   
   if (error) {
@@ -1032,19 +1027,20 @@ if (parcialJugador) {
       .filter(Boolean)
       .join(" · ");
            }
-      const filaAyer =
-  dataAyer?.find(
+  
+  const filaAnterior =
+  historialAnterior?.find(
     anterior =>
       anterior.jugador_id === fila.jugador_id
   );
 
 let movimiento = "🆕";
 
-if (filaAyer) {
+if (filaAnterior) {
 
   const diferencia =
-    filaAyer.posicion - fila.posicion;
-
+    filaAnterior.posicion - fila.posicion;
+  
   if (diferencia > 0) {
     movimiento = `↑${diferencia}`;
   }
