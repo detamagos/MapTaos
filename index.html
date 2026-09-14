@@ -1084,7 +1084,12 @@ if (filaAnterior) {
       <span>
         ${medalla}
         ${fila.posicion}.
-<strong>${fila.nombre}</strong>
+<strong
+  style="cursor:pointer;"
+  onclick="abrirPerfilJugador(${fila.jugador_id}, '${fila.nombre}')"
+>
+  ${fila.nombre}
+</strong>
 <span style="
   margin-left:6px;
   font-size:13px;
@@ -1474,6 +1479,45 @@ async function cargarRankingMensual() {
 
     }).join("");
 }
+
+function abrirPerfilJugador(jugadorId, nombre) {
+
+  const appView =
+    document.getElementById("appView");
+
+  const profileView =
+    document.getElementById("profileView");
+
+  const profileName =
+    document.getElementById("profileName");
+
+  const profileContent =
+    document.getElementById("profileContent");
+
+  profileName.textContent =
+    `Perfil de ${nombre}`;
+
+  profileContent.innerHTML =
+    "Cargando estadísticas...";
+
+  appView.classList.add("hidden");
+  profileView.classList.remove("hidden");
+}
+
+  document
+  .getElementById("backFromProfile")
+  .addEventListener("click", () => {
+
+    document
+      .getElementById("profileView")
+      .classList
+      .add("hidden");
+
+    document
+      .getElementById("appView")
+      .classList
+      .remove("hidden");
+  });
   
 async function iniciarApp() {
 
