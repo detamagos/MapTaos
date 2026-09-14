@@ -295,6 +295,16 @@
   </div>
 </div>
 
+<div class="card">
+  <h2 class="home-section-title">
+    Clasificación mensual
+  </h2>
+
+  <div id="rankingMensual" class="placeholder">
+    Cargando clasificación mensual...
+  </div>
+</div>
+    
   </section>
 
 </div>
@@ -825,7 +835,8 @@ if (resultadoPendiente.tieneBanderas) {
       "success"
     );
     await cargarRankingHoy();
-await cargarRankingSemanal();
+    await cargarRankingSemanal();
+    await cargarRankingMensual();
     
     resultadoPendiente = null;
   }
@@ -1281,6 +1292,174 @@ lunesAnterior.setUTCDate(
     }).join("");
             }
 
+async function cargarRankingMensual() {
+
+  const rankingMensual =
+    document.getElementById("rankingMensual");
+
+  const fechaMadrid = fechaMadridISO();
+
+  const [anio, mes] =
+    fechaMadrid.split("-").map(Number);
+
+  const inicioMesActual =
+    `${anio}-${String(mes).padStart(2, "0")}-01`;
+
+  let anioAnterior = anio;
+  let mesAnterior = mes - 1;
+
+  if (mesAnterior === 0) {
+    mesAnterior = 12;
+    anioAnterior = anio - 1;
+  }
+
+  const inicioMesAnterior =
+    `${anioAnterior}-${String(mesAnterior).padStart(2, "0")}-01`;
+
+
+  const {
+    data: actual,
+    error: errorActual
+  } =
+    await supabaseClient
+      .from("ranking_mensual")
+      .select(
+        "inicio_mes, jugador_id, nombre, puntos, dias_jugados, posicion"
+      )
+      .eq(
+        "inicio_mes",
+        inicioMesActual
+      )
+      .order(
+        "posicion",
+        { ascending: true }
+      );
+
+
+  const {
+    data: anterior
+  } =
+    await supabaseClient
+      .from("ranking_mensual")
+      .select(
+        "inicio_mes, jugador_id, nombre, puntos, dias_jugados, posicion"
+      )
+      .eq(
+        "inicio_mes",
+        inicioMesAnterior
+      )
+      .order(
+        "posicion",
+        { ascending: true }
+      );
+
+
+  if (errorActual) {
+
+    rankingMensual.innerHTML =
+      "No se pudo cargar la clasificación mensual.";
+
+    return;
+  }
+
+
+  if (!actual || actual.length === 0) {
+
+    rankingMensual.innerHTML =
+      "Todavía no hay resultados este mes.";
+
+    return;
+  }
+
+
+  rankingMensual.innerHTML =
+    actual.map(fila => {
+
+      let medalla = "";
+
+      if (fila.posicion === 1) {
+        medalla = "🥇";
+      }
+      else if (fila.posicion === 2) {
+        medalla = "🥈";
+      }
+      else if (fila.posicion === 3) {
+        medalla = "🥉";
+      }
+
+
+      const filaAnterior =
+        anterior?.find(
+          anteriorFila =>
+            anteriorFila.jugador_id === fila.jugador_id
+        );
+
+
+      let movimiento = "🆕";
+
+      if (filaAnterior) {
+
+        const diferencia =
+          filaAnterior.posicion - fila.posicion;
+
+        if (diferencia > 0) {
+          movimiento = `↑${diferencia}`;
+        }
+        else if (diferencia < 0) {
+          movimiento = `↓${Math.abs(diferencia)}`;
+        }
+        else {
+          movimiento = "=";
+        }
+      }
+
+
+      return `
+        <div style="
+          padding:10px 0;
+          border-bottom:1px solid #ddd;
+        ">
+
+          <div style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+          ">
+
+            <span>
+              ${medalla}
+              ${fila.posicion}.
+              <strong>${fila.nombre}</strong>
+
+              <span style="
+                margin-left:6px;
+                font-size:13px;
+              ">
+                ${movimiento}
+              </span>
+            </span>
+
+            <strong>
+              ${fila.puntos}
+            </strong>
+
+          </div>
+
+          <div style="
+            margin-top:5px;
+            font-size:13px;
+            color:#666;
+          ">
+            ${fila.dias_jugados}
+            ${fila.dias_jugados === 1 ? "día jugado" : "días jugados"}
+          </div>
+
+        </div>
+      `;
+
+    }).join("");
+}
+  
 async function iniciarApp() {
 
   mostrarApp();
@@ -1290,6 +1469,8 @@ async function iniciarApp() {
   await cargarRankingHoy();
 
   await cargarRankingSemanal();
+
+  await cargarRankingMensual();
 
 }
 
