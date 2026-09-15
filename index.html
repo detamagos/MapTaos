@@ -1608,8 +1608,67 @@ profileContent.innerHTML = `
   
   appView.classList.add("hidden");
   profileView.classList.remove("hidden");
+  mostrarEvolucion(resultados, "diario");
 }
 
+function mostrarEvolucion(resultados, periodo = "diario") {
+
+  const contenedor = document.getElementById("profileChart");
+
+  if (!contenedor) return;
+
+  contenedor.innerHTML = "";
+
+  if (!resultados || resultados.length === 0) {
+    contenedor.innerHTML = "No hay datos para mostrar.";
+    return;
+  }
+
+  const etiquetas = resultados.map(fila => {
+    const fecha = new Date(fila.fecha + "T00:00:00");
+
+    return fecha.toLocaleDateString("es-ES", {
+      day: "2-digit",
+      month: "2-digit"
+    });
+  });
+
+  const puntuaciones = resultados.map(
+    fila => Number(fila.final_score)
+  );
+
+  contenedor.innerHTML = `
+    <canvas id="evolutionChart"></canvas>
+  `;
+
+  const canvas = document.getElementById("evolutionChart");
+
+  new Chart(canvas, {
+    type: "line",
+
+    data: {
+      labels: etiquetas,
+
+      datasets: [{
+        label: "Final Score",
+        data: puntuaciones,
+        tension: 0.25
+      }]
+    },
+
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+
+      scales: {
+        y: {
+          beginAtZero: false
+        }
+      }
+    }
+  });
+}
+  
   document
   .getElementById("backFromProfile")
   .addEventListener("click", () => {
