@@ -1551,6 +1551,7 @@ const { data: resultados, error } =
         .eq("jugador_id", jugadorId)
         .order("fecha", { ascending: true });
 
+  
 if (error) {
     profileContent.innerHTML =
         "No se pudieron cargar las estadísticas.";
@@ -1562,7 +1563,10 @@ if (!resultados || resultados.length === 0) {
         "Este jugador todavía no tiene resultados.";
     return;
 }
+  
+window.resultadosPerfilActual = resultados;
 
+  
 const partidas = resultados.length;
 
 const totalPuntos = resultados.reduce(
@@ -1674,6 +1678,20 @@ function mostrarEvolucion(resultados, periodo = "diario") {
     }
   });
 }
+
+document
+  .getElementById("chartPeriodSelector")
+  .addEventListener("click", (event) => {
+
+    const boton = event.target.closest("button");
+    if (!boton) return;
+
+    const periodo = boton.dataset.periodo;
+
+    if (periodo && window.resultadosPerfilActual) {
+      mostrarEvolucion(window.resultadosPerfilActual, periodo);
+    }
+  });
   
   document
   .getElementById("backFromProfile")
