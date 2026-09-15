@@ -1480,7 +1480,7 @@ async function cargarRankingMensual() {
     }).join("");
 }
 
-function abrirPerfilJugador(jugadorId, nombre) {
+async function abrirPerfilJugador(jugadorId, nombre) {
 
   const appView =
     document.getElementById("appView");
@@ -1500,6 +1500,50 @@ function abrirPerfilJugador(jugadorId, nombre) {
   profileContent.innerHTML =
     "Cargando estadísticas...";
 
+const { data: resultados, error } =
+    await supabaseClient
+        .from("resultados")
+        .select("fecha, final_score")
+        .eq("jugador_id", jugadorId)
+        .order("fecha", { ascending: true });
+
+if (error) {
+    profileContent.innerHTML =
+        "No se pudieron cargar las estadísticas.";
+    return;
+}
+
+if (!resultados || resultados.length === 0) {
+    profileContent.innerHTML =
+        "Este jugador todavía no tiene resultados.";
+    return;
+}
+
+const partidas = resultados.length;
+
+const totalPuntos = resultados.reduce(
+    (suma, fila) => suma + Number(fila.final_score),
+    0
+);
+
+const media = Math.round(totalPuntos / partidas);
+
+const mejor = Math.max(
+    ...resultados.map(fila => Number(fila.final_score))
+);
+
+const ultimo =
+    Number(resultados[resultados.length - 1].final_score);
+
+profileContent.innerHTML = `
+    <div style="font-size:18px; line-height:2;">
+        <div>🎮 Partidas jugadas: <strong>${partidas}</strong></div>
+        <div>📊 Puntuación media: <strong>${media}</strong></div>
+        <div>🏆 Mejor resultado: <strong>${mejor}</strong></div>
+        <div>🕐 Último resultado: <strong>${ultimo}</strong></div>
+    </div>
+`;
+  
   appView.classList.add("hidden");
   profileView.classList.remove("hidden");
 }
