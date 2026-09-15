@@ -1717,136 +1717,6 @@ function mostrarEvolucion(resultados, periodo) {
     );
   }
 
-function mostrarEvolucion(resultados, periodo = "diario") {
-
-  const contenedor = document.getElementById("profileChart");
-  if (!contenedor) return;
-
-  contenedor.innerHTML = "";
-
-  if (!resultados || resultados.length === 0) {
-    contenedor.innerHTML = "No hay datos para mostrar.";
-    return;
-  }
-
-  const datosOrdenados = [...resultados].sort(
-    (a, b) => new Date(a.fecha) - new Date(b.fecha)
-  );
-
-  let etiquetas = [];
-  let puntuaciones = [];
-
-  // ===== DIARIO =====
-  if (periodo === "diario") {
-
-    etiquetas = datosOrdenados.map(fila => {
-      const fecha = new Date(fila.fecha + "T00:00:00");
-
-      return fecha.toLocaleDateString("es-ES", {
-        day: "numeric",
-        month: "numeric"
-      });
-    });
-
-    puntuaciones = datosOrdenados.map(
-      fila => Number(fila.final_score)
-    );
-  }
-
-  // ===== SEMANAL =====
-  else if (periodo === "semanal") {
-
-    const semanas = {};
-
-    datosOrdenados.forEach(fila => {
-
-      const fecha = new Date(fila.fecha + "T00:00:00");
-
-      const lunes = new Date(fecha);
-      const dia = lunes.getDay() || 7;
-      lunes.setDate(lunes.getDate() - dia + 1);
-
-      const clave = lunes.toISOString().slice(0, 10);
-
-      if (!semanas[clave]) {
-        semanas[clave] = [];
-      }
-
-      semanas[clave].push(Number(fila.final_score));
-    });
-
-    Object.keys(semanas).sort().forEach(clave => {
-
-      const fecha = new Date(clave + "T00:00:00");
-
-      etiquetas.push(
-        "Sem. " +
-        fecha.toLocaleDateString("es-ES", {
-          day: "numeric",
-          month: "numeric"
-        })
-      );
-
-      const valores = semanas[clave];
-
-      puntuaciones.push(
-        Math.round(
-          valores.reduce((suma, valor) => suma + valor, 0) /
-          valores.length
-        )
-      );
-    });
-  }
-
-  // ===== MENSUAL =====
-  else if (periodo === "mensual") {
-
-    const meses = {};
-
-    datosOrdenados.forEach(fila => {
-
-      const fecha = new Date(fila.fecha + "T00:00:00");
-
-      const clave =
-        fecha.getFullYear() +
-        "-" +
-        String(fecha.getMonth() + 1).padStart(2, "0");
-
-      if (!meses[clave]) {
-        meses[clave] = [];
-      }
-
-      meses[clave].push(Number(fila.final_score));
-    });
-
-    Object.keys(meses).sort().forEach(clave => {
-
-      const [anio, mes] = clave.split("-");
-
-      const fecha = new Date(
-        Number(anio),
-        Number(mes) - 1,
-        1
-      );
-
-      etiquetas.push(
-        fecha.toLocaleDateString("es-ES", {
-          month: "short",
-          year: "numeric"
-        })
-      );
-
-      const valores = meses[clave];
-
-      puntuaciones.push(
-        Math.round(
-          valores.reduce((suma, valor) => suma + valor, 0) /
-          valores.length
-        )
-      );
-    });
-  }
-
   contenedor.innerHTML =
     '<canvas id="evolutionChart"></canvas>';
 
@@ -1860,7 +1730,13 @@ function mostrarEvolucion(resultados, periodo = "diario") {
       labels: etiquetas,
 
       datasets: [{
-        label: "Final Score",
+        label:
+          periodo === "diario"
+            ? "Final Score"
+            : periodo === "semanal"
+            ? "Media semanal"
+            : "Media mensual",
+
         data: puntuaciones,
         tension: 0.25
       }]
@@ -1878,7 +1754,7 @@ function mostrarEvolucion(resultados, periodo = "diario") {
     }
   });
 }
-  
+
 document
   .getElementById("chartPeriodSelector")
   .addEventListener("click", (event) => {
@@ -1941,4 +1817,4 @@ comprobarSesion();
 </script>
 
 </body>
-</html>
+</html> 
