@@ -1621,7 +1621,7 @@ profileContent.innerHTML = `
   mostrarEvolucion(resultados, "diario");
 }
 
-function mostrarEvolucion(resultados, periodo = "diario") {
+function mostrarEvolucion(resultados, periodo) {
 
   const contenedor = document.getElementById("profileChart");
 
@@ -1634,24 +1634,94 @@ function mostrarEvolucion(resultados, periodo = "diario") {
     return;
   }
 
-  const etiquetas = resultados.map(fila => {
-    const fecha = new Date(fila.fecha + "T00:00:00");
+  let etiquetas = [];
+  let puntuaciones = [];
 
-    return fecha.toLocaleDateString("es-ES", {
-      day: "2-digit",
-      month: "2-digit"
+  if (periodo === "diario") {
+
+    etiquetas = resultados.map(fila => {
+      const fecha = new Date(fila.fecha + "T00:00:00");
+
+      return fecha.toLocaleDateString("es-ES", {
+        day: "numeric",
+        month: "numeric"
+      });
     });
-  });
 
-  const puntuaciones = resultados.map(
-    fila => Number(fila.final_score)
-  );
+    puntuaciones = resultados.map(
+      fila => Number(fila.final_score)
+    );
 
-  contenedor.innerHTML = `
-    <canvas id="evolutionChart"></canvas>
-  `;
+  } else {
 
-  const canvas = document.getElementById("evolutionChart");
+    const grupos = {};
+
+    resultados.forEach(fila => {
+
+      const fecha = new Date(fila.fecha + "T00:00:00");
+      let clave;
+      let etiqueta;
+
+      if (periodo === "semanal") {
+
+        const lunes = new Date(fecha);
+        const dia = lunes.getDay();
+        const diferencia = dia === 0 ? -6 : 1 - dia;
+
+        lunes.setDate(lunes.getDate() + diferencia);
+
+        clave = lunes.toISOString().slice(0, 10);
+
+        etiqueta =
+          "Sem. " +
+          lunes.toLocaleDateString("es-ES", {
+            day: "numeric",
+            month: "numeric"
+          });
+
+      } else {
+
+        clave =
+          fecha.getFullYear() +
+          "-" +
+          String(fecha.getMonth() + 1).padStart(2, "0");
+
+        etiqueta = fecha.toLocaleDateString("es-ES", {
+          month: "short",
+          year: "numeric"
+        });
+      }
+
+      if (!grupos[clave]) {
+        grupos[clave] = {
+          etiqueta: etiqueta,
+          total: 0,
+          cantidad: 0
+        };
+      }
+
+      grupos[clave].total += Number(fila.final_score);
+      grupos[clave].cantidad++;
+    });
+
+    const gruposOrdenados = Object.keys(grupos).sort();
+
+    etiquetas = gruposOrdenados.map(
+      clave => grupos[clave].etiqueta
+    );
+
+    puntuaciones = gruposOrdenados.map(
+      clave => Math.round(
+        grupos[clave].total / grupos[clave].cantidad
+      )
+    );
+  }
+
+  contenedor.innerHTML =
+    '<canvas id="evolutionChart"></canvas>';
+
+  const canvas =
+    document.getElementById("evolutionChart");
 
   new Chart(canvas, {
     type: "line",
@@ -1660,7 +1730,13 @@ function mostrarEvolucion(resultados, periodo = "diario") {
       labels: etiquetas,
 
       datasets: [{
-        label: "Final Score",
+        label:
+          periodo === "diario"
+            ? "Final Score"
+            : periodo === "semanal"
+            ? "Media semanal"
+            : "Media mensual",
+
         data: puntuaciones,
         tension: 0.25
       }]
