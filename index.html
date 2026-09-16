@@ -1619,7 +1619,7 @@ profileContent.innerHTML = `
   
   appView.classList.add("hidden");
   profileView.classList.remove("hidden");
-  mostrarEvolucion(resultados, "diario");
+  mostrarEvolucion(resultados, "30d");
 }
 
 function mostrarEvolucion(resultados, periodo) {
@@ -1644,29 +1644,45 @@ function mostrarEvolucion(resultados, periodo) {
 const hoy = new Date();
 hoy.setHours(0, 0, 0, 0);
 
-let diasAMostrar;
+let diasAMostrar = null;
 
-if (periodo === "diario") {
+if (periodo === "30d") {
   diasAMostrar = 30;
-} else if (periodo === "semanal") {
-  diasAMostrar = 7;
-} else {
+} else if (periodo === "3m") {
   diasAMostrar = 90;
+} else if (periodo === "1a") {
+  diasAMostrar = 365;
 }
 
-const fechaLimite = new Date(hoy);
-fechaLimite.setDate(hoy.getDate() - (diasAMostrar - 1));
+let resultadosPeriodo;
 
-const resultadosPeriodo = resultados
-  .filter(fila => {
-    const fecha = new Date(fila.fecha + "T00:00:00");
-    return fecha >= fechaLimite && fecha <= hoy;
-  })
-  .sort((a, b) =>
-    new Date(a.fecha + "T00:00:00") -
-    new Date(b.fecha + "T00:00:00")
-  );
+if (periodo === "todo") {
 
+  resultadosPeriodo = resultados
+    .filter(fila => {
+      const fecha = new Date(fila.fecha + "T00:00:00");
+      return fecha <= hoy;
+    })
+    .sort((a, b) =>
+      new Date(a.fecha + "T00:00:00") -
+      new Date(b.fecha + "T00:00:00")
+    );
+
+} else {
+
+  const fechaLimite = new Date(hoy);
+  fechaLimite.setDate(hoy.getDate() - (diasAMostrar - 1));
+
+  resultadosPeriodo = resultados
+    .filter(fila => {
+      const fecha = new Date(fila.fecha + "T00:00:00");
+      return fecha >= fechaLimite && fecha <= hoy;
+    })
+    .sort((a, b) =>
+      new Date(a.fecha + "T00:00:00") -
+      new Date(b.fecha + "T00:00:00")
+    );
+}
 etiquetas = resultadosPeriodo.map(fila => {
   const fecha = new Date(fila.fecha + "T00:00:00");
 
