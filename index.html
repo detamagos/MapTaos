@@ -1726,12 +1726,21 @@ contenedor.innerHTML = `
     data: {
       labels: etiquetas,
 
-      datasets: [{
-        label: "Final Score",
-
-        data: puntuaciones,
-        tension: 0.25
-      }]
+datasets: [
+  {
+    label: "Final Score",
+    data: puntuaciones,
+    tension: 0.25
+  },
+  {
+    label: `Media: ${mediaPeriodo}`,
+    data: puntuaciones.map(() => mediaPeriodo),
+    borderDash: [6, 6],
+    pointRadius: 0,
+    pointHoverRadius: 0,
+    tension: 0
+  }
+]
     },
 
     options: {
