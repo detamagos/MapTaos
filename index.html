@@ -362,9 +362,10 @@
 <div class="card">
   <h2>📈 Evolución</h2>
 <div id="chartPeriodSelector">
-  <button type="button" data-period="diario">Diario</button>
-  <button type="button" data-period="semanal">Semanal</button>
-  <button type="button" data-period="mensual">Mensual</button>
+  <button type="button" data-periodo="30d">30 días</button>
+  <button type="button" data-periodo="3m">3 meses</button>
+  <button type="button" data-periodo="1a">1 año</button>
+  <button type="button" data-periodo="todo">Todo</button>
 </div>
   <div id="profileChart">
     Cargando evolución...
@@ -1637,85 +1638,47 @@ function mostrarEvolucion(resultados, periodo) {
   let etiquetas = [];
   let puntuaciones = [];
 
-  if (periodo === "diario") {
+ // Todos los periodos muestran puntuaciones DIARIAS.
+// El periodo solo determina cuántos días se muestran.
 
-    etiquetas = resultados.map(fila => {
-      const fecha = new Date(fila.fecha + "T00:00:00");
+const hoy = new Date();
+hoy.setHours(0, 0, 0, 0);
 
-      return fecha.toLocaleDateString("es-ES", {
-        day: "numeric",
-        month: "numeric"
-      });
-    });
+let diasAMostrar;
 
-    puntuaciones = resultados.map(
-      fila => Number(fila.final_score)
-    );
+if (periodo === "diario") {
+  diasAMostrar = 30;
+} else if (periodo === "semanal") {
+  diasAMostrar = 7;
+} else {
+  diasAMostrar = 90;
+}
 
-  } else {
+const fechaLimite = new Date(hoy);
+fechaLimite.setDate(hoy.getDate() - (diasAMostrar - 1));
 
-    const grupos = {};
+const resultadosPeriodo = resultados
+  .filter(fila => {
+    const fecha = new Date(fila.fecha + "T00:00:00");
+    return fecha >= fechaLimite && fecha <= hoy;
+  })
+  .sort((a, b) =>
+    new Date(a.fecha + "T00:00:00") -
+    new Date(b.fecha + "T00:00:00")
+  );
 
-    resultados.forEach(fila => {
+etiquetas = resultadosPeriodo.map(fila => {
+  const fecha = new Date(fila.fecha + "T00:00:00");
 
-      const fecha = new Date(fila.fecha + "T00:00:00");
-      let clave;
-      let etiqueta;
+  return fecha.toLocaleDateString("es-ES", {
+    day: "numeric",
+    month: "numeric"
+  });
+});
 
-      if (periodo === "semanal") {
-
-        const lunes = new Date(fecha);
-        const dia = lunes.getDay();
-        const diferencia = dia === 0 ? -6 : 1 - dia;
-
-        lunes.setDate(lunes.getDate() + diferencia);
-
-        clave = lunes.toISOString().slice(0, 10);
-
-        etiqueta =
-          "Sem. " +
-          lunes.toLocaleDateString("es-ES", {
-            day: "numeric",
-            month: "numeric"
-          });
-
-      } else {
-
-        clave =
-          fecha.getFullYear() +
-          "-" +
-          String(fecha.getMonth() + 1).padStart(2, "0");
-
-        etiqueta = fecha.toLocaleDateString("es-ES", {
-          month: "short",
-          year: "numeric"
-        });
-      }
-
-      if (!grupos[clave]) {
-        grupos[clave] = {
-          etiqueta: etiqueta,
-          total: 0,
-          cantidad: 0
-        };
-      }
-
-      grupos[clave].total += Number(fila.final_score);
-      grupos[clave].cantidad++;
-    });
-
-    const gruposOrdenados = Object.keys(grupos).sort();
-
-    etiquetas = gruposOrdenados.map(
-      clave => grupos[clave].etiqueta
-    );
-
-    puntuaciones = gruposOrdenados.map(
-      clave => Math.round(
-        grupos[clave].total / grupos[clave].cantidad
-      )
-    );
-  }
+puntuaciones = resultadosPeriodo.map(
+  fila => Number(fila.final_score)
+);
 
   contenedor.innerHTML =
     '<canvas id="evolutionChart"></canvas>';
@@ -1730,12 +1693,7 @@ function mostrarEvolucion(resultados, periodo) {
       labels: etiquetas,
 
       datasets: [{
-        label:
-          periodo === "diario"
-            ? "Final Score"
-            : periodo === "semanal"
-            ? "Media semanal"
-            : "Media mensual",
+        label: "Final Score",
 
         data: puntuaciones,
         tension: 0.25
