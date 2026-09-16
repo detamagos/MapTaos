@@ -1747,6 +1747,22 @@ datasets: [
       responsive: true,
       maintainAspectRatio: false,
 
+plugins: {
+  tooltip: {
+    callbacks: {
+      title: function(context) {
+        return context[0].label;
+      },
+      label: function(context) {
+        if (context.dataset.label.startsWith("Media")) {
+          return `Media del período: ${context.parsed.y}`;
+        }
+        return `Puntuación: ${context.parsed.y}`;
+      }
+    }
+  }
+},
+      
       scales: {
         y: {
           beginAtZero: false
