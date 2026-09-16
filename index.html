@@ -1702,8 +1702,20 @@ puntuaciones = resultadosPeriodo.map(
   fila => Number(fila.final_score)
 );
 
-  contenedor.innerHTML =
-    '<canvas id="evolutionChart"></canvas>';
+const mediaPeriodo =
+  puntuaciones.length > 0
+    ? Math.round(
+        puntuaciones.reduce((suma, puntos) => suma + puntos, 0) /
+        puntuaciones.length
+      )
+    : 0;
+  
+contenedor.innerHTML = `
+  <div style="text-align:center; margin-bottom:10px;">
+    <strong>Media del período: ${mediaPeriodo} puntos</strong>
+  </div>
+  <canvas id="evolutionChart"></canvas>
+`;
 
   const canvas =
     document.getElementById("evolutionChart");
