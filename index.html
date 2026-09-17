@@ -1625,9 +1625,18 @@ const totalPuntos = resultados.reduce(
 
 const media = Math.round(totalPuntos / partidas);
 
-const mejor = Math.max(
-    ...resultados.map(fila => Number(fila.final_score))
+const mejorResultado = resultados.reduce(
+  (mejor, fila) =>
+    Number(fila.final_score) > Number(mejor.final_score)
+      ? fila
+      : mejor
 );
+
+const mejor = Number(mejorResultado.final_score);
+
+const fechaMejor =
+  new Date(mejorResultado.fecha + "T00:00:00")
+    .toLocaleDateString("es-ES");
 
 const ultimo =
     Number(resultados[resultados.length - 1].final_score);
@@ -1709,7 +1718,7 @@ profileContent.innerHTML = `
         `}
         <div>🎮 Partidas jugadas: <strong>${partidas}</strong></div>
         <div>📊 Puntuación media: <strong>${media}</strong></div>
-        <div>🏆 Mejor resultado: <strong>${mejor}</strong></div>
+        <div>🏆 Mejor resultado: <strong>${mejor}</strong> — ${fechaMejor}</div>
         <div>🕐 Último resultado: <strong>${ultimo}</strong></div>
     </div>
 <div>🔥 Racha actual: <strong>${racha} días</strong></div>  
