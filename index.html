@@ -1590,6 +1590,14 @@ const { data: rondasHoy } =
     .select("pais_1, pais_2, pais_3, pais_4, pais_5")
     .eq("fecha", hoy)
     .maybeSingle();
+
+const { data: rankingHoyJugador } =
+  await supabaseClient
+    .from("ranking_diario")
+    .select("posicion")
+    .eq("fecha", hoy)
+    .eq("jugador_id", jugadorId)
+    .maybeSingle();
   
 if (error) {
     profileContent.innerHTML =
@@ -1689,7 +1697,7 @@ profileContent.innerHTML = `
     <div style="font-size:18px; line-height:2;">
             ${resultadoHoy ? `
               <div style="margin-bottom:12px;">
-              <strong>📍 Resultado de hoy: ${resultadoHoy.final_score} puntos</strong>
+              <strong>📍 Resultado de hoy: ${resultadoHoy.final_score} puntos${rankingHoyJugador ? ` — ${rankingHoyJugador.posicion}.º` : ""}</strong>
               <div style="font-size:14px;">
                 ${rondasHoyTexto}
             </div>
