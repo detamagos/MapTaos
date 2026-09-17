@@ -1087,8 +1087,18 @@ if (parcialJugador) {
           return "";
         }
 
-        const bandera =
-          banderas[i] || "";
+const codigoPais =
+  banderas[i] || "";
+
+const bandera =
+  codigoPais
+    ? String.fromCodePoint(
+        ...codigoPais
+          .toUpperCase()
+          .split("")
+          .map(letra => 127397 + letra.charCodeAt())
+      )
+    : "";
 
         return bandera
           ? `${bandera} ${puntosRonda}`
@@ -1554,7 +1564,7 @@ async function abrirPerfilJugador(jugadorId, nombre) {
 const { data: resultados, error } =
     await supabaseClient
         .from("resultados")
-        .select("fecha, final_score")
+        .select("fecha, final_score, ronda_1, ronda_2, ronda_3, ronda_4, ronda_5, bandera_1, bandera_2, bandera_3, bandera_4, bandera_5")
         .eq("jugador_id", jugadorId)
         .order("fecha", { ascending: true });
 
