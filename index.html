@@ -964,6 +964,25 @@ function limpiarMensaje() {
   return `${valores.year}-${valores.month}-${valores.day}`;
  } 
 
+function banderaACodigo(bandera) {
+  if (!bandera) return "";
+
+  const puntos = Array.from(bandera).map(
+    caracter => caracter.codePointAt(0)
+  );
+
+  if (
+    puntos.length !== 2 ||
+    puntos.some(punto => punto < 127462 || punto > 127487)
+  ) {
+    return "";
+  }
+
+  return puntos
+    .map(punto => String.fromCharCode(punto - 127397))
+    .join("");
+}
+  
 async function cargarRankingHoy() {
 
   const rankingHoy =
@@ -1090,9 +1109,14 @@ if (parcialJugador) {
 const bandera =
   banderas[i] || "";
 
-        return bandera
-          ? `${bandera} ${puntosRonda}`
-          : `${puntosRonda}`;
+const codigoPais =
+  banderaACodigo(bandera);
+
+return codigoPais
+  ? `<img src="https://flagcdn.com/20x15/${codigoPais.toLowerCase()}.png"
+       alt="${codigoPais}"
+       style="width:20px;height:15px;vertical-align:middle;margin-right:3px;"> ${puntosRonda}`
+  : `${puntosRonda}`;
       })
       .filter(Boolean)
       .join(" · ");
