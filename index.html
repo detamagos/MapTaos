@@ -1578,10 +1578,18 @@ async function abrirPerfilJugador(jugadorId, nombre) {
 const { data: resultados, error } =
     await supabaseClient
         .from("resultados")
-        .select("fecha, final_score, ronda_1, ronda_2, ronda_3, ronda_4, ronda_5, bandera_1, bandera_2, bandera_3, bandera_4, bandera_5")
+        .select("fecha, final_score, ronda_1, ronda_2, ronda_3, ronda_4, ronda_5")
         .eq("jugador_id", jugadorId)
         .order("fecha", { ascending: true });
+  
+const hoy = fechaMadridISO();
 
+const { data: rondasHoy } =
+  await supabaseClient
+    .from("rondas_dia")
+    .select("pais_1, pais_2, pais_3, pais_4, pais_5")
+    .eq("fecha", hoy)
+    .maybeSingle();
   
 if (error) {
     profileContent.innerHTML =
@@ -1597,6 +1605,8 @@ if (!resultados || resultados.length === 0) {
   
 window.resultadosPerfilActual = resultados;
 
+const resultadoHoy =
+  resultados.find(fila => fila.fecha === hoy);  
   
 const partidas = resultados.length;
 
@@ -1636,9 +1646,59 @@ for (let i = resultados.length - 1; i > 0; i--) {
         break;
     }
 }
+
+let rondasHoyTexto = "";
+
+if (resultadoHoy) {
+  const puntosHoy = [
+    resultadoHoy.ronda_1,
+    resultadoHoy.ronda_2,
+    resultadoHoy.ronda_3,
+    resultadoHoy.ronda_4,
+    resultadoHoy.ronda_5
+  ];
+
+  const banderasHoy = rondasHoy
+    ? [
+        rondasHoy.pais_1,
+        rondasHoy.pais_2,
+        rondasHoy.pais_3,
+        rondasHoy.pais_4,
+        rondasHoy.pais_5
+      ]
+    : [];
+
+  rondasHoyTexto = puntosHoy
+    .map((puntos, i) => {
+      if (puntos === null) return "";
+
+      const codigoPais =
+        banderaACodigo(banderasHoy[i] || "");
+
+      return codigoPais
+        ? `<img src="https://flagcdn.com/20x15/${codigoPais.toLowerCase()}.png"
+             alt="${codigoPais}"
+             style="width:20px;height:15px;vertical-align:middle;margin-right:3px;"> ${puntos}`
+        : `${puntos}`;
+    })
+    .filter(Boolean)
+    .join(" · ");
+}
   
 profileContent.innerHTML = `
     <div style="font-size:18px; line-height:2;">
+            ${resultadoHoy ? `
+              <div style="margin-bottom:12px;">
+              <strong>📍 Resultado de hoy: ${resultadoHoy.final_score} puntos</strong>
+              <div style="font-size:14px;">
+                ${rondasHoyTexto}
+            </div>
+          </div>
+        ` : `
+          <div style="margin-bottom:12px;">
+            📍 Todavía no ha jugado hoy
+          </div>
+        `}
         <div>🎮 Partidas jugadas: <strong>${partidas}</strong></div>
         <div>📊 Puntuación media: <strong>${media}</strong></div>
         <div>🏆 Mejor resultado: <strong>${mejor}</strong></div>
