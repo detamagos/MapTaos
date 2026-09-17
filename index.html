@@ -1087,17 +1087,8 @@ if (parcialJugador) {
           return "";
         }
 
-const codigoPais =
-  banderas[i] || "";
-
 const bandera =
-  codigoPais.length === 2
-    ? codigoPais
-        .toUpperCase()
-        .replace(/./g, letra =>
-          String.fromCodePoint(127397 + letra.charCodeAt(0))
-        )
-    : "";
+  banderas[i] || "";
 
         return bandera
           ? `${bandera} ${puntosRonda}`
