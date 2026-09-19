@@ -641,7 +641,7 @@ async function cargarJugador() {
   } =
     await supabaseClient
       .from("jugadores")
-      .select("id, nombre, activo")
+      .select("id, nombre, alias, activo")
       .eq("auth_user_id", user.id)
       .single();
 
@@ -663,8 +663,8 @@ if (!data.activo) {
   
   jugadorActual = data;
 
-  playerName.textContent =
-    "👤 " + data.nombre;
+playerName.textContent =
+  "👤 " + (data.alias || data.nombre);
 
   return true;
 }
@@ -1163,7 +1163,7 @@ async function cargarRankingHoy() {
   await supabaseClient
     .from("ranking_diario")
     .select(
-      "fecha, jugador_id, nombre, final_score, posicion"
+      "fecha, jugador_id, nombre, final_score, posicion, alias"
     )
     .lt("fecha", hoy)
     .order("fecha", {
@@ -1311,9 +1311,9 @@ if (filaAnterior) {
         ${fila.posicion}.
 <strong
   style="cursor:pointer;"
-  onclick="abrirPerfilJugador(${fila.jugador_id}, '${fila.nombre}')"
+onclick="abrirPerfilJugador(${fila.jugador_id}, '${fila.alias || fila.nombre}')"
 >
-  ${fila.nombre}
+  ${fila.alias || fila.nombre}
 </strong>
 <span style="
   margin-left:6px;
@@ -1419,7 +1419,7 @@ lunesAnterior.setUTCDate(
     await supabaseClient
       .from("ranking_semanal")
       .select(
-        "inicio_semana, jugador_id, nombre, puntos, dias_jugados, posicion"
+        "inicio_semana, jugador_id, nombre, puntos, dias_jugados, posicion, alias"
       )
       .eq(
         "inicio_semana",
@@ -1507,10 +1507,10 @@ lunesAnterior.setUTCDate(
               ${medalla}
               ${fila.posicion}
               <strong
-  onclick="abrirPerfilJugador(${fila.jugador_id}, '${fila.nombre}')"
-  style="cursor:pointer;"
+onclick="abrirPerfilJugador(${fila.jugador_id}, '${fila.alias || fila.nombre}')"
+style="cursor:pointer;"
 >
-  ${fila.nombre}
+  ${fila.alias || fila.nombre}
 </strong>
 
               <span style="
@@ -1592,7 +1592,7 @@ async function cargarRankingMensual() {
     await supabaseClient
       .from("ranking_mensual")
       .select(
-        "inicio_mes, jugador_id, nombre, puntos, dias_jugados, posicion"
+        "inicio_mes, jugador_id, nombre, puntos, dias_jugados, posicion, alias"
       )
       .eq(
         "inicio_mes",
@@ -1680,10 +1680,10 @@ async function cargarRankingMensual() {
               ${medalla}
               ${fila.posicion}
               <strong
-  onclick="abrirPerfilJugador(${fila.jugador_id}, '${fila.nombre}')"
-  style="cursor:pointer;"
+onclick="abrirPerfilJugador(${fila.jugador_id}, '${fila.alias || fila.nombre}')"
+style="cursor:pointer;"
 >
-  ${fila.nombre}
+  ${fila.alias || fila.nombre}
 </strong>
 
               <span style="
@@ -1729,7 +1729,7 @@ async function cargarTop20General() {
         ronda_3,
         ronda_4,
         ronda_5,
-        jugadores(nombre)
+        jugadores(nombre, alias)
       `)
       .order("final_score", { ascending: false })
       .limit(20);
@@ -2114,7 +2114,9 @@ function mostrarTop20(top20, rondasPorFecha, errorTop20) {
           .toLocaleDateString("es-ES");
 
       const nombre =
-        fila.jugadores?.nombre || "Jugador";
+        fila.jugadores?.alias ||
+        fila.jugadores?.nombre ||
+        "Jugador";
 
       const rondasDia =
         rondasPorFecha?.find(
