@@ -1831,12 +1831,14 @@ const banderas = rondasDia
     const codigoPais =
       banderaACodigo(banderas[j] || "");
 
-    return codigoPais
-      ? `<img src="https://flagcdn.com/20x15/${codigoPais.toLowerCase()}.png"
-           alt="${codigoPais}"
-           style="width:20px;height:15px;vertical-align:middle;margin-right:3px;"> ${puntosRonda}`
-      : `${puntosRonda}`;
+   return codigoPais
+  ? `<span style="white-space:nowrap;"><img
+       src="https://flagcdn.com/20x15/${codigoPais.toLowerCase()}.png"
+       alt="${codigoPais}"
+       style="width:20px;height:15px;vertical-align:middle;margin-right:1px;">${puntosRonda}</span>`
+  : `<span style="white-space:nowrap;">${puntosRonda}</span>`;
   })
+        
   .filter(Boolean)
   .join(" · ");
       return `
@@ -1942,7 +1944,7 @@ function mostrarTop20(top20, rondasPorFecha, errorTop20) {
   </div>
 
     <div style="
-      margin-left:18px;
+      margin-left:0px;
       margin-top:4px;
       font-size:13px;
     ">
