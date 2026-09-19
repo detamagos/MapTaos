@@ -32,13 +32,15 @@
   left: 0;
   right: 0;
 }
-  #chartPeriodSelector {
+#chartPeriodSelector,
+#homeRankingSelector {
   display: flex;
   gap: 8px;
   margin-bottom: 18px;
 }
 
-#chartPeriodSelector button {
+#chartPeriodSelector button,
+#homeRankingSelector button {
   width: auto;
   flex: 1;
   padding: 10px 6px;
@@ -312,11 +314,7 @@
 
     <div id="messageBox"></div>
 
-    <div style="
-  display:flex;
-  gap:6px;
-  margin-bottom:12px;
-">
+<div id="homeRankingSelector">
 
   <button type="button" id="btnHoy">
     Hoy
