@@ -2100,8 +2100,8 @@ function mostrarEvolucion(resultados, periodo) {
  // Todos los periodos muestran puntuaciones DIARIAS.
 // El periodo solo determina cuántos días se muestran.
 
-const hoy = new Date();
-hoy.setHours(0, 0, 0, 0);
+const fechaHoy = fechaMadridISO();
+const hoy = new Date(fechaHoy + "T00:00:00");
 
 let diasAMostrar = null;
 
