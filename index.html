@@ -242,6 +242,21 @@
     ></div>
 
     <button
+      type="button"
+      id="logoutButton"
+      class="btn-secondary"
+      style="
+        width:auto;
+        margin:6px auto 12px;
+        padding:6px 12px;
+        font-size:13px;
+        display:block;
+      "
+    >
+      Cerrar sesión
+    </button>
+    
+    <button
       class="btn-result"
       id="pasteResultButton"
     >
@@ -2329,6 +2344,15 @@ document
 document
   .getElementById("btnTop20")
   .addEventListener("click", () => mostrarSeccionInicio("top20"));
+
+document
+  .getElementById("logoutButton")
+  .addEventListener("click", async () => {
+
+  await supabaseClient.auth.signOut();
+
+  window.location.reload();
+  });
   
 async function iniciarApp() {
 
