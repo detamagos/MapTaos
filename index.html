@@ -555,6 +555,14 @@ async function cargarJugador() {
     return false;
   }
 
+if (!data.activo) {
+  mostrarMensaje(
+    "Tu jugador está desactivado.",
+    "error"
+  );
+  return false;
+}
+  
   jugadorActual = data;
 
   playerName.textContent =
