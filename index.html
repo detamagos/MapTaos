@@ -1149,7 +1149,7 @@ async function cargarRankingHoy() {
     await supabaseClient
       .from("ranking_diario")
       .select(
-        "fecha, jugador_id, nombre, final_score, posicion"
+        "fecha, jugador_id, nombre, final_score, posicion,alias"
       )
       .eq("fecha", hoy)
       .order("posicion", {
