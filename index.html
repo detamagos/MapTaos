@@ -1921,10 +1921,25 @@ function mostrarTop20(top20, rondasPorFecha, errorTop20) {
      return `
   <div style="padding:8px 0; border-bottom:1px solid #ddd;">
 
+  <div style="
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:8px;
+  ">
     <div>
       <strong>${i + 1}. ${nombre}</strong>
-      <span> — ${fila.final_score} puntos</span>
+      <span> — ${fila.final_score}</span>
     </div>
+  
+    <span style="
+      font-size:12px;
+      color:#777;
+      white-space:nowrap;
+    ">
+      ${fecha}
+    </span>
+  </div>
 
     <div style="
       margin-left:18px;
@@ -1932,15 +1947,6 @@ function mostrarTop20(top20, rondasPorFecha, errorTop20) {
       font-size:13px;
     ">
       ${textoRondas}
-    </div>
-
-    <div style="
-      margin-left:18px;
-      margin-top:3px;
-      font-size:12px;
-      color:#777;
-    ">
-      ${fecha}
     </div>
 
   </div>
