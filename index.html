@@ -385,6 +385,14 @@
     Cargando mejores resultados...
   </div>
 </div>
+
+<div class="card">
+  <h2>🌍 Top-20 general</h2>
+
+  <div id="profileTop20">
+    Cargando mejores resultados...
+  </div>
+</div>
     
   </section>
 
@@ -1589,6 +1597,23 @@ const { data: resultados, error } =
         .select("fecha, final_score, ronda_1, ronda_2, ronda_3, ronda_4, ronda_5")
         .eq("jugador_id", jugadorId)
         .order("fecha", { ascending: true });
+
+const { data: top20General, error: errorTop20 } =
+  await supabaseClient
+    .from("resultados")
+    .select(`
+      fecha,
+      final_score,
+      jugador_id,
+      ronda_1,
+      ronda_2,
+      ronda_3,
+      ronda_4,
+      ronda_5,
+      jugadores(nombre)
+    `)
+    .order("final_score", { ascending: false })
+    .limit(20);
   
 const hoy = fechaMadridISO();
 
@@ -1743,6 +1768,7 @@ profileContent.innerHTML = `
   profileView.classList.remove("hidden");
   mostrarEvolucion(resultados, "30d");
 mostrarTop10(top10, rondasPorFecha);
+  mostrarTop20(top20General, rondasPorFecha, errorTop20);
 }
 
 function mostrarTop10(top10, rondasPorFecha) {
@@ -1805,6 +1831,44 @@ const banderas = rondasDia
           <strong>${i + 1}. ${fila.final_score} puntos</strong>
           <span style="margin-left:8px;">${fecha}</span>
           <div style="font-size:14px; margin-top:4px;">${textoRondas}</div>
+        </div>
+      `;
+    })
+    .join("");
+}
+  function mostrarTop20(top20, rondasPorFecha, errorTop20) {
+
+  const contenedor =
+    document.getElementById("profileTop20");
+
+  if (!contenedor) return;
+
+  if (errorTop20) {
+    contenedor.innerHTML =
+      "No se pudo cargar el Top-20.";
+    return;
+  }
+
+  if (!top20 || top20.length === 0) {
+    contenedor.innerHTML =
+      "No hay resultados para mostrar.";
+    return;
+  }
+
+  contenedor.innerHTML = top20
+    .map((fila, i) => {
+
+      const fecha =
+        new Date(fila.fecha + "T00:00:00")
+          .toLocaleDateString("es-ES");
+
+      const nombre =
+        fila.jugadores?.nombre || "Jugador";
+
+      return `
+        <div style="padding:8px 0; border-bottom:1px solid #ddd;">
+          <strong>${i + 1}. ${nombre} — ${fila.final_score} puntos</strong>
+          <span style="margin-left:8px;">${fecha}</span>
         </div>
       `;
     })
