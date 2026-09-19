@@ -2052,15 +2052,18 @@ function mostrarTop20(top20, rondasPorFecha, errorTop20) {
     ${i + 1}
   </span>
 
+  <strong style="
+    display:inline-block;
+    width:42px;
+  ">
+    ${fila.final_score}
+  </strong>
+
   <strong
     onclick="abrirPerfilJugador(${fila.jugador_id}, '${nombre}')"
     style="cursor:pointer;"
   >
     ${nombre}
-  </strong>
-
-  <strong style="margin-left:8px;">
-    ${fila.final_score}
   </strong>
 </div>
   
