@@ -1592,12 +1592,13 @@ const { data: resultados, error } =
   
 const hoy = fechaMadridISO();
 
-const { data: rondasHoy } =
+const { data: rondasPorFecha } =
   await supabaseClient
     .from("rondas_dia")
-    .select("pais_1, pais_2, pais_3, pais_4, pais_5")
-    .eq("fecha", hoy)
-    .maybeSingle();
+    .select("fecha, pais_1, pais_2, pais_3, pais_4, pais_5");
+
+const rondasHoy =
+  rondasPorFecha?.find(fila => fila.fecha === hoy);
 
 const { data: rankingHoyJugador } =
   await supabaseClient
@@ -1741,10 +1742,10 @@ profileContent.innerHTML = `
   appView.classList.add("hidden");
   profileView.classList.remove("hidden");
   mostrarEvolucion(resultados, "30d");
-  mostrarTop10(top10);
+mostrarTop10(top10, rondasPorFecha);
 }
 
-function mostrarTop10(top10) {
+function mostrarTop10(top10, rondasPorFecha) {
 
   const contenedor =
     document.getElementById("profileTop10");
@@ -1764,10 +1765,46 @@ function mostrarTop10(top10) {
         new Date(fila.fecha + "T00:00:00")
           .toLocaleDateString("es-ES");
 
+      const rondasDia =
+  rondasPorFecha?.find(ronda => ronda.fecha === fila.fecha);
+
+const puntos = [
+  fila.ronda_1,
+  fila.ronda_2,
+  fila.ronda_3,
+  fila.ronda_4,
+  fila.ronda_5
+];
+
+const banderas = rondasDia
+  ? [
+      rondasDia.pais_1,
+      rondasDia.pais_2,
+      rondasDia.pais_3,
+      rondasDia.pais_4,
+      rondasDia.pais_5
+    ]
+  : [];
+      const textoRondas = puntos
+  .map((puntosRonda, j) => {
+    if (puntosRonda === null) return "";
+
+    const codigoPais =
+      banderaACodigo(banderas[j] || "");
+
+    return codigoPais
+      ? `<img src="https://flagcdn.com/20x15/${codigoPais.toLowerCase()}.png"
+           alt="${codigoPais}"
+           style="width:20px;height:15px;vertical-align:middle;margin-right:3px;"> ${puntosRonda}`
+      : `${puntosRonda}`;
+  })
+  .filter(Boolean)
+  .join(" · ");
       return `
         <div style="padding:8px 0; border-bottom:1px solid #ddd;">
           <strong>${i + 1}. ${fila.final_score} puntos</strong>
           <span style="margin-left:8px;">${fecha}</span>
+          <div style="font-size:14px; margin-top:4px;">${textoRondas}</div>
         </div>
       `;
     })
