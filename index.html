@@ -981,25 +981,9 @@ function limpiarMensaje() {
   messageBox.innerHTML = "";
 }
 
- function fechaMadridISO(fecha = new Date()) {
-  const partes =
-    new Intl.DateTimeFormat("en-CA", {
-      timeZone: "Europe/Madrid",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit"
-    }).formatToParts(fecha);
-
-  const valores = {};
-
-  for (const parte of partes) {
-    if (parte.type !== "literal") {
-      valores[parte.type] = parte.value;
-    }
-  }
-
-  return `${valores.year}-${valores.month}-${valores.day}`;
- } 
+function fechaMadridISO(fecha = new Date()) {
+  return fecha.toISOString().slice(0, 10);
+}
 
 function banderaACodigo(bandera) {
   if (!bandera) return "";
