@@ -2170,6 +2170,30 @@ function mostrarSeccionInicio(seccion) {
     top20: "seccionTop20"
   };
 
+const botones = {
+  hoy: "btnHoy",
+  semana: "btnSemana",
+  mes: "btnMes",
+  top20: "btnTop20"
+};
+
+Object.values(botones).forEach(id => {
+  const boton = document.getElementById(id);
+
+  if (boton) {
+    boton.style.background = "#f1f1f1";
+    boton.style.color = "#111";
+  }
+});
+
+const botonActivo =
+  document.getElementById(botones[seccion]);
+
+if (botonActivo) {
+  botonActivo.style.background = "#111";
+  botonActivo.style.color = "#fff";
+}
+  
   Object.values(secciones).forEach(id => {
     document.getElementById(id)?.classList.add("hidden");
   });
