@@ -931,6 +931,16 @@ saveResultButton.addEventListener(
       return;
     }
 
+const hoy = fechaMadridISO();
+
+if (resultadoPendiente.fechaSQL !== hoy) {
+  mostrarMensaje(
+    "Solo puedes guardar el resultado del día actual.",
+    "error"
+  );
+  return;
+}
+    
     saveResultButton.disabled = true;
     saveResultButton.textContent =
       "Guardando...";
