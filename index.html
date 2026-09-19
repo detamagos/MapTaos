@@ -740,6 +740,19 @@ const tieneBanderas = banderas.length === 5;
     );
   }
 
+  const scoreCalculado =
+    puntuaciones[0] +
+    puntuaciones[1] +
+    (puntuaciones[2] * 2) +
+    (puntuaciones[3] * 3) +
+    (puntuaciones[4] * 3);
+  
+  if (score !== scoreCalculado) {
+    throw new Error(
+      "El Final Score no coincide con las 5 rondas."
+    );
+  }
+    
   const meses = {
     january: 0,
     february: 1,
