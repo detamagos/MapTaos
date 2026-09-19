@@ -1400,7 +1400,7 @@ lunesAnterior.setUTCDate(
     await supabaseClient
       .from("ranking_semanal")
       .select(
-        "inicio_semana, jugador_id, nombre, puntos, dias_jugados, posicion"
+        "inicio_semana, jugador_id, nombre, puntos, dias_jugados, posicion, alias"
       )
       .eq(
         "inicio_semana",
@@ -1574,7 +1574,7 @@ async function cargarRankingMensual() {
     await supabaseClient
       .from("ranking_mensual")
       .select(
-        "inicio_mes, jugador_id, nombre, puntos, dias_jugados, posicion"
+        "inicio_mes, jugador_id, nombre, puntos, dias_jugados, posicion, alias"
       )
       .eq(
         "inicio_mes",
