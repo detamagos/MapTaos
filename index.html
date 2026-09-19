@@ -1677,6 +1677,12 @@ const { data: rankingHoyJugador } =
     .eq("fecha", hoy)
     .eq("jugador_id", jugadorId)
     .maybeSingle();
+
+const { count: jugadoresHoy } =
+  await supabaseClient
+    .from("ranking_diario")
+    .select("*", { count: "exact", head: true })
+    .eq("fecha", hoy);
   
 if (error) {
     profileContent.innerHTML =
@@ -1791,7 +1797,7 @@ profileContent.innerHTML = `
     <div style="font-size:18px; line-height:2;">
             ${resultadoHoy ? `
               <div style="margin-bottom:12px;">
-              <strong>📍 Resultado de hoy: ${resultadoHoy.final_score} puntos${rankingHoyJugador ? ` — ${rankingHoyJugador.posicion}.º` : ""}</strong>
+<strong>📍 Resultado de hoy: ${resultadoHoy.final_score} puntos${rankingHoyJugador ? ` — ${rankingHoyJugador.posicion}º / ${jugadoresHoy}` : ""}</strong>
               <div style="font-size:14px;">
                 ${rondasHoyTexto}
             </div>
@@ -1801,12 +1807,44 @@ profileContent.innerHTML = `
             📍 Todavía no ha jugado hoy
           </div>
         `}
-        <div>🎮 Partidas jugadas: <strong>${partidas}</strong></div>
-        <div>📊 Puntuación media: <strong>${media}</strong></div>
-        <div>🏆 Mejor resultado: <strong>${mejor}</strong> — ${fechaMejor}</div>
-        <div>🕐 Último resultado: <strong>${ultimo}</strong></div>
-    </div>
-<div>🔥 Racha actual: <strong>${racha} días</strong></div>  
+<div style="
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px 20px;
+  margin-top:12px;
+  line-height:1.4;
+">
+
+  <div>
+    <div style="font-size:13px;">🎮 Partidas</div>
+    <strong>${partidas}</strong>
+  </div>
+
+  <div>
+    <div style="font-size:13px;">📊 Media</div>
+    <strong>${media}</strong>
+  </div>
+
+  <div>
+    <div style="font-size:13px;">🏆 Mejor resultado</div>
+    <strong>${mejor}</strong>
+    <span style="font-size:12px; color:#777;">
+      — ${fechaMejor}
+    </span>
+  </div>
+
+  <div>
+    <div style="font-size:13px;">🕐 Último resultado</div>
+    <strong>${ultimo}</strong>
+  </div>
+
+  <div>
+    <div style="font-size:13px;">🔥 Racha actual</div>
+    <strong>${racha} días</strong>
+  </div>
+
+</div>
+</div>
 `;
   
   appView.classList.add("hidden");
