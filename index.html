@@ -229,7 +229,42 @@
 
   </section>
 
+<section id="setPasswordView" class="hidden">
 
+  <div class="card">
+
+    <h1>🌍 MapTaos</h1>
+    <p class="subtitle">
+      Crea tu contraseña
+    </p>
+
+    <input
+      type="password"
+      id="newPassword"
+      placeholder="Nueva contraseña"
+    >
+
+    <input
+      type="password"
+      id="confirmPassword"
+      placeholder="Repite la contraseña"
+    >
+
+    <button
+      class="btn-primary"
+      id="setPasswordButton"
+    >
+      Guardar contraseña
+    </button>
+
+    <p class="small">
+      La utilizarás para entrar en MapTaos.
+    </p>
+
+  </div>
+
+</section>
+  
   <!-- APP -->
   <section id="appView" class="hidden">
 
@@ -454,6 +489,9 @@ let resultadoPendiente = null;
 const loginView =
   document.getElementById("loginView");
 
+const setPasswordView =
+  document.getElementById("setPasswordView");
+
 const appView =
   document.getElementById("appView");
 
@@ -497,6 +535,13 @@ const messageBox =
 function mostrarLogin() {
   loginView.classList.remove("hidden");
   appView.classList.add("hidden");
+  setPasswordView.classList.add("hidden");
+}
+
+function mostrarCrearPassword() {
+  loginView.classList.add("hidden");
+  appView.classList.add("hidden");
+  setPasswordView.classList.remove("hidden");
 }
 
 function mostrarApp() {
@@ -541,6 +586,44 @@ loginButton.addEventListener(
   }
 );
 
+  document
+  .getElementById("setPasswordButton")
+  .addEventListener("click", async () => {
+
+    const password =
+      document.getElementById("newPassword").value;
+
+    const confirmacion =
+      document.getElementById("confirmPassword").value;
+
+    if (password.length < 6) {
+      alert("La contraseña debe tener al menos 6 caracteres.");
+      return;
+    }
+
+    if (password !== confirmacion) {
+      alert("Las contraseñas no coinciden.");
+      return;
+    }
+
+    const { error } =
+      await supabaseClient.auth.updateUser({
+        password: password
+      });
+
+    if (error) {
+      alert("No se pudo guardar la contraseña.");
+      return;
+    }
+
+    window.history.replaceState(
+      {},
+      document.title,
+      window.location.pathname
+    );
+
+    await iniciarApp();
+  });
 
 async function cargarJugador() {
 
@@ -2377,14 +2460,20 @@ async function comprobarSesion() {
   const { data } =
     await supabaseClient.auth.getSession();
 
-  if (data.session) {
+  const esInvitacion =
+    window.location.hash.includes("type=invite") ||
+    window.location.search.includes("type=invite");
+
+  if (data.session && esInvitacion) {
+    mostrarCrearPassword();
+  }
+  else if (data.session) {
     await iniciarApp();
   }
   else {
     mostrarLogin();
   }
 }
-
 comprobarSesion();
 
 </script>
