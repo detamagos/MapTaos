@@ -1393,7 +1393,12 @@ lunesAnterior.setUTCDate(
             <span>
               ${medalla}
               ${fila.posicion}.
-              <strong>${fila.nombre}</strong>
+              <strong
+  onclick="abrirPerfilJugador(${fila.jugador_id}, '${fila.nombre}')"
+  style="cursor:pointer;"
+>
+  ${fila.nombre}
+</strong>
 
               <span style="
                 margin-left:6px;
@@ -1561,7 +1566,12 @@ async function cargarRankingMensual() {
             <span>
               ${medalla}
               ${fila.posicion}.
-              <strong>${fila.nombre}</strong>
+              <strong
+  onclick="abrirPerfilJugador(${fila.jugador_id}, '${fila.nombre}')"
+  style="cursor:pointer;"
+>
+  ${fila.nombre}
+</strong>
 
               <span style="
                 margin-left:6px;
@@ -1950,10 +1960,15 @@ function mostrarTop20(top20, rondasPorFecha, errorTop20) {
     align-items:center;
     gap:8px;
   ">
-    <div>
-      <strong>${i + 1}. ${nombre}</strong>
-      <span> — ${fila.final_score}</span>
-    </div>
+<div>
+  <strong
+    onclick="abrirPerfilJugador(${fila.jugador_id}, '${nombre}')"
+    style="cursor:pointer;"
+  >
+    ${i + 1}. ${nombre}
+  </strong>
+  <span> — ${fila.final_score}</span>
+</div>
   
     <span style="
       font-size:12px;
