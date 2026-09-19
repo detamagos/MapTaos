@@ -342,6 +342,14 @@
     Cargando clasificación mensual...
   </div>
 </div>
+
+<div class="card">
+  <h2>🌍 Top-20 general</h2>
+
+  <div id="profileTop20">
+    Cargando mejores resultados...
+  </div>
+</div>
     
   </section>
 
@@ -385,15 +393,7 @@
     Cargando mejores resultados...
   </div>
 </div>
-
-<div class="card">
-  <h2>🌍 Top-20 general</h2>
-
-  <div id="profileTop20">
-    Cargando mejores resultados...
-  </div>
-</div>
-    
+   
   </section>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1571,6 +1571,37 @@ async function cargarRankingMensual() {
     }).join("");
 }
 
+async function cargarTop20General() {
+
+  const { data: top20General, error: errorTop20 } =
+    await supabaseClient
+      .from("resultados")
+      .select(`
+        fecha,
+        final_score,
+        jugador_id,
+        ronda_1,
+        ronda_2,
+        ronda_3,
+        ronda_4,
+        ronda_5,
+        jugadores(nombre)
+      `)
+      .order("final_score", { ascending: false })
+      .limit(20);
+
+  const { data: rondasPorFecha } =
+    await supabaseClient
+      .from("rondas_dia")
+      .select("fecha, pais_1, pais_2, pais_3, pais_4, pais_5");
+
+  mostrarTop20(
+    top20General,
+    rondasPorFecha,
+    errorTop20
+  );
+}
+  
 async function abrirPerfilJugador(jugadorId, nombre) {
 
   const appView =
@@ -1597,24 +1628,7 @@ const { data: resultados, error } =
         .select("fecha, final_score, ronda_1, ronda_2, ronda_3, ronda_4, ronda_5")
         .eq("jugador_id", jugadorId)
         .order("fecha", { ascending: true });
-
-const { data: top20General, error: errorTop20 } =
-  await supabaseClient
-    .from("resultados")
-    .select(`
-      fecha,
-      final_score,
-      jugador_id,
-      ronda_1,
-      ronda_2,
-      ronda_3,
-      ronda_4,
-      ronda_5,
-      jugadores(nombre)
-    `)
-    .order("final_score", { ascending: false })
-    .limit(20);
-  
+ 
 const hoy = fechaMadridISO();
 
 const { data: rondasPorFecha } =
@@ -1768,8 +1782,7 @@ profileContent.innerHTML = `
   profileView.classList.remove("hidden");
   mostrarEvolucion(resultados, "30d");
 mostrarTop10(top10, rondasPorFecha);
-  mostrarTop20(top20General, rondasPorFecha, errorTop20);
-}
+ }
 
 function mostrarTop10(top10, rondasPorFecha) {
 
@@ -2068,6 +2081,7 @@ async function iniciarApp() {
 
   await cargarRankingMensual();
 
+  await cargarTop20General();
 }
 
 
