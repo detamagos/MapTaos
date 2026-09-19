@@ -1797,7 +1797,7 @@ profileContent.innerHTML = `
     <div style="font-size:18px; line-height:2;">
             ${resultadoHoy ? `
               <div style="margin-bottom:12px;">
-<strong>📍 Resultado de hoy: ${resultadoHoy.final_score} puntos${rankingHoyJugador ? ` — ${rankingHoyJugador.posicion}º / ${jugadoresHoy}` : ""}</strong>
+              <strong>📍 Hoy: ${resultadoHoy.final_score}${rankingHoyJugador ? ` — ${rankingHoyJugador.posicion}º / ${jugadoresHoy}` : ""}</strong>
               <div style="font-size:14px;">
                 ${rondasHoyTexto}
             </div>
@@ -1820,10 +1820,10 @@ profileContent.innerHTML = `
     <strong>${partidas}</strong>
   </div>
 
-  <div>
-    <div style="font-size:13px;">📊 Media</div>
-    <strong>${media}</strong>
-  </div>
+<div>
+  <div style="font-size:13px;">🔥 Racha actual</div>
+  <strong>${racha} días</strong>
+</div>
 
   <div>
     <div style="font-size:13px;">🏆 Mejor resultado</div>
@@ -1838,10 +1838,10 @@ profileContent.innerHTML = `
     <strong>${ultimo}</strong>
   </div>
 
-  <div>
-    <div style="font-size:13px;">🔥 Racha actual</div>
-    <strong>${racha} días</strong>
-  </div>
+<div>
+  <div style="font-size:13px;">📊 Media</div>
+  <strong>${media}</strong>
+</div>
 
 </div>
 </div>
