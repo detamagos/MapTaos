@@ -377,6 +377,14 @@
     Cargando evolución...
   </div>
 </div>
+
+<div class="card">
+  <h2>🏆 Top-10 personal</h2>
+
+  <div id="profileTop10">
+    Cargando mejores resultados...
+  </div>
+</div>
     
   </section>
 
@@ -1615,6 +1623,12 @@ window.resultadosPerfilActual = resultados;
 
 const resultadoHoy =
   resultados.find(fila => fila.fecha === hoy);  
+
+const top10 = [...resultados]
+  .sort((a, b) =>
+    Number(b.final_score) - Number(a.final_score)
+  )
+  .slice(0, 10);
   
 const partidas = resultados.length;
 
@@ -1727,8 +1741,39 @@ profileContent.innerHTML = `
   appView.classList.add("hidden");
   profileView.classList.remove("hidden");
   mostrarEvolucion(resultados, "30d");
+  mostrarTop10(top10);
 }
 
+function mostrarTop10(top10) {
+
+  const contenedor =
+    document.getElementById("profileTop10");
+
+  if (!contenedor) return;
+
+  if (!top10 || top10.length === 0) {
+    contenedor.innerHTML =
+      "No hay resultados para mostrar.";
+    return;
+  }
+
+  contenedor.innerHTML = top10
+    .map((fila, i) => {
+
+      const fecha =
+        new Date(fila.fecha + "T00:00:00")
+          .toLocaleDateString("es-ES");
+
+      return `
+        <div style="padding:8px 0; border-bottom:1px solid #ddd;">
+          <strong>${i + 1}. ${fila.final_score} puntos</strong>
+          <span style="margin-left:8px;">${fecha}</span>
+        </div>
+      `;
+    })
+    .join("");
+}
+  
 function mostrarEvolucion(resultados, periodo) {
 
   const contenedor = document.getElementById("profileChart");
