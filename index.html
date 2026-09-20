@@ -622,6 +622,23 @@ loginButton.addEventListener(
       return;
     }
 
+const { error: errorJugador } =
+  await supabaseClient
+    .from("jugadores")
+    .update({
+      password_configurada: true
+    })
+    .eq("id", jugadorActual.id);
+
+if (errorJugador) {
+  alert(
+    "La contraseña se ha guardado, pero no se pudo completar el alta."
+  );
+  return;
+}
+
+jugadorActual.password_configurada = true;
+    
     window.history.replaceState(
       {},
       document.title,
@@ -647,7 +664,7 @@ async function cargarJugador() {
   } =
     await supabaseClient
       .from("jugadores")
-      .select("id, nombre, alias, activo")
+      .select("id, nombre, alias, activo, password_configurada")
       .eq("auth_user_id", user.id)
       .single();
 
@@ -2533,11 +2550,21 @@ document
   
 async function iniciarApp() {
 
+  const jugadorCargado =
+    await cargarJugador();
+
+  if (!jugadorCargado) {
+    return;
+  }
+
+  if (!jugadorActual.password_configurada) {
+    mostrarCrearPassword();
+    return;
+  }
+
   mostrarApp();
 
   mostrarSeccionInicio("hoy");
-
-  await cargarJugador();
 
   await cargarRankingHoy();
 
@@ -2547,8 +2574,14 @@ async function iniciarApp() {
 
   await cargarTop20General();
 }
+supabaseClient.auth.onAuthStateChange((event, session) => {
 
+  if (event === "PASSWORD_RECOVERY") {
+    mostrarCrearPassword();
+  }
 
+});
+  
 async function comprobarSesion() {
 
   const { data } =
