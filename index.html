@@ -2575,13 +2575,6 @@ async function iniciarApp() {
 
   await cargarTop20General();
 }
-supabaseClient.auth.onAuthStateChange((event, session) => {
-
-  if (event === "PASSWORD_RECOVERY") {
-    mostrarCrearPassword();
-  }
-
-});
   
 async function comprobarSesion() {
 
