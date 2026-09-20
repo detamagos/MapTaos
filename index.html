@@ -2442,11 +2442,17 @@ document
         .eq("id", jugadorActual.id);
 
    if (error) {
-      alert(
-        "Error Supabase: " + error.message
-      );
-      return;
-    }
+  if (error.code === "23505") {
+    alert(
+      "Ese alias ya está siendo utilizado por otro jugador. Elige otro."
+    );
+  } else {
+    alert(
+      "No se pudo cambiar el alias. Inténtalo de nuevo."
+    );
+  }
+  return;
+}
     jugadorActual.alias = aliasLimpio;
 
     document.getElementById("playerName").textContent =
