@@ -2558,6 +2558,11 @@ async function iniciarApp() {
     return;
   }
 
+  console.log(
+    "password_configurada:",
+    jugadorActual.password_configurada
+  );
+  
   if (!jugadorActual.password_configurada) {
     mostrarCrearPassword();
     return;
