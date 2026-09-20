@@ -2415,8 +2415,9 @@ plugins: {
   });
 
 document
+  document
   .getElementById("btnEditarAlias")
-  .addEventListener("click", () => {
+  .addEventListener("click", async () => {
 
     const nuevoAlias = prompt(
       "Introduce tu nuevo alias:",
@@ -2425,7 +2426,37 @@ document
 
     if (nuevoAlias === null) return;
 
-    alert("Nuevo alias: " + nuevoAlias);
+    const aliasLimpio = nuevoAlias.trim();
+
+    if (!aliasLimpio) {
+      alert("El alias no puede estar vacío.");
+      return;
+    }
+
+    const { error } =
+      await supabaseClient
+        .from("jugadores")
+        .update({
+          alias: aliasLimpio
+        })
+        .eq("id", jugadorActual.id);
+
+    if (error) {
+      alert(
+        "No se pudo cambiar el alias. Comprueba que no esté siendo utilizado por otro jugador."
+      );
+      return;
+    }
+
+    jugadorActual.alias = aliasLimpio;
+
+    document.getElementById("playerName").textContent =
+      "👤 " + aliasLimpio;
+
+    document.getElementById("profileName").textContent =
+      "Perfil de " + aliasLimpio;
+
+    alert("Alias actualizado correctamente.");
   });
   
 function mostrarSeccionInicio(seccion) {
