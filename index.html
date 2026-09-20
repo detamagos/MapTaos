@@ -2581,17 +2581,9 @@ async function comprobarSesion() {
   const { data } =
     await supabaseClient.auth.getSession();
 
-  const esInvitacion =
-    window.location.hash.includes("type=invite") ||
-    window.location.search.includes("type=invite");
-
-  if (data.session && esInvitacion) {
-    mostrarCrearPassword();
-  }
-  else if (data.session) {
+  if (data.session) {
     await iniciarApp();
-  }
-  else {
+  } else {
     mostrarLogin();
   }
 }
