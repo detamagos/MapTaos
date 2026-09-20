@@ -2414,6 +2414,20 @@ plugins: {
       .remove("hidden");
   });
 
+document
+  .getElementById("btnEditarAlias")
+  .addEventListener("click", () => {
+
+    const nuevoAlias = prompt(
+      "Introduce tu nuevo alias:",
+      jugadorActual.alias || jugadorActual.nombre
+    );
+
+    if (nuevoAlias === null) return;
+
+    alert("Nuevo alias: " + nuevoAlias);
+  });
+  
 function mostrarSeccionInicio(seccion) {
 
   const secciones = {
