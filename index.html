@@ -436,6 +436,12 @@
   Perfil
 </h1>
 
+<div id="editarAliasContainer" class="hidden" style="text-align:center; margin-bottom:16px;">
+  <button id="btnEditarAlias" type="button" class="btn-secondary">
+    ✏️ Cambiar alias
+  </button>
+</div>
+    
 <div class="card">
   <h2>📊 Estadísticas</h2>
 
@@ -1759,6 +1765,15 @@ async function abrirPerfilJugador(jugadorId, nombre) {
 
   const profileContent =
     document.getElementById("profileContent");
+
+  const editarAliasContainer =
+  document.getElementById("editarAliasContainer");
+
+  if (Number(jugadorId) === Number(jugadorActual.id)) {
+    editarAliasContainer.classList.remove("hidden");
+  } else {
+    editarAliasContainer.classList.add("hidden");
+  }
 
   profileName.textContent =
     `Perfil de ${nombre}`;
