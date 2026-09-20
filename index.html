@@ -195,7 +195,7 @@
 <div class="app">
 
   <!-- LOGIN -->
-  <section id="loginView">
+  <section id="loginView" class="hidden">
 
     <div class="card">
 
@@ -2558,11 +2558,6 @@ async function iniciarApp() {
     return;
   }
 
-  console.log(
-    "password_configurada:",
-    jugadorActual.password_configurada
-  );
-  
   if (!jugadorActual.password_configurada) {
     mostrarCrearPassword();
     return;
