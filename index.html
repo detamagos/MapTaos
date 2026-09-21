@@ -1126,25 +1126,24 @@ function mostrarMensaje(
   messageBox.innerHTML =
     '<div class="'
     + tipo
-    + '" style="position:relative; padding-right:36px;">'
+    + '" style="position:relative; padding-right:40px;">'
     + texto
-    + '<button type="button"'
+    + '<span'
     + ' onclick="messageBox.innerHTML=\'\'"'
+    + ' role="button"'
     + ' aria-label="Cerrar aviso"'
     + ' style="'
     + 'position:absolute;'
+    + 'right:12px;'
     + 'top:50%;'
-    + 'right:10px;'
     + 'transform:translateY(-50%);'
-    + 'border:none;'
-    + 'background:transparent;'
-    + 'font-size:20px;'
+    + 'font-size:22px;'
+    + 'font-weight:bold;'
+    + 'line-height:1;'
     + 'cursor:pointer;'
-    + 'padding:4px;'
-    + '">×</button>'
+    + '">×</span>'
     + '</div>';
 }
-
 
 function limpiarMensaje() {
   messageBox.innerHTML = "";
