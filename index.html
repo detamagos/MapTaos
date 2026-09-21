@@ -1287,10 +1287,10 @@ const codigoPais =
   banderaACodigo(bandera);
 
 return codigoPais
-  ? `<img src="https://flagcdn.com/20x15/${codigoPais.toLowerCase()}.png"
+  ? `<span style="white-space:nowrap;"><img src="https://flagcdn.com/20x15/${codigoPais.toLowerCase()}.png"
        alt="${codigoPais}"
-       style="width:20px;height:15px;vertical-align:middle;margin-right:3px;"> ${puntosRonda}`
-  : `${puntosRonda}`;
+       style="width:20px;height:15px;vertical-align:middle;margin-right:3px;">${puntosRonda}</span>`
+  : `<span style="white-space:nowrap;">${puntosRonda}</span>`;
       })
       .filter(Boolean)
       .join(" · ");
