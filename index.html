@@ -2432,9 +2432,9 @@ plugins: {
     }
   });
   
-  document
+ document
   .getElementById("backFromProfile")
-  .addEventListener("click", () => {
+  .addEventListener("click", async () => {
 
     document
       .getElementById("profileView")
@@ -2445,6 +2445,11 @@ plugins: {
       .getElementById("appView")
       .classList
       .remove("hidden");
+
+    await cargarRankingHoy();
+    await cargarRankingSemanal();
+    await cargarRankingMensual();
+    await cargarTop20General();
   });
 
 document
