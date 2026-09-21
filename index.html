@@ -706,7 +706,7 @@ const lineaRondas =
   texto
     .split("\n")
     .find(linea =>
-      !/www\.maptap\.gg/i.test(linea) &&
+      !/(?:www\.maptap\.gg|MapTap)\s+[A-Za-z]+\s+\d{1,2}/i.test(linea) &&
       !/Final score:/i.test(linea) &&
       /\d/.test(linea)
     );
@@ -736,10 +736,10 @@ if (
     .map(resultado => resultado[1]);
 
 const tieneBanderas = banderas.length === 5;
-  const fechaMatch =
-    texto.match(
-      /www\.maptap\.gg\s+([A-Za-z]+)\s+(\d{1,2})/i
-    );
+const fechaMatch =
+  texto.match(
+    /(?:www\.maptap\.gg|MapTap)\s+([A-Za-z]+)\s+(\d{1,2})/i
+  );
 
   if (!scoreMatch) {
     throw new Error(
