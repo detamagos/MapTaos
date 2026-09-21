@@ -1126,8 +1126,22 @@ function mostrarMensaje(
   messageBox.innerHTML =
     '<div class="'
     + tipo
-    + '">'
+    + '" style="position:relative; padding-right:36px;">'
     + texto
+    + '<button type="button"'
+    + ' onclick="messageBox.innerHTML=\'\'"'
+    + ' aria-label="Cerrar aviso"'
+    + ' style="'
+    + 'position:absolute;'
+    + 'top:50%;'
+    + 'right:10px;'
+    + 'transform:translateY(-50%);'
+    + 'border:none;'
+    + 'background:transparent;'
+    + 'font-size:20px;'
+    + 'cursor:pointer;'
+    + 'padding:4px;'
+    + '">×</button>'
     + '</div>';
 }
 
