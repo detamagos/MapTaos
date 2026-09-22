@@ -2616,6 +2616,11 @@ async function editarAlias() {
   document.getElementById("profileName").textContent =
     "Perfil de " + aliasLimpio;
 
+  await cargarRankingHoy();
+  await cargarRankingSemanal();
+  await cargarRankingMensual();
+  await cargarTop20General();
+
   alert("Alias actualizado correctamente.");
 }
 
