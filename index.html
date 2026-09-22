@@ -271,10 +271,28 @@
     <h1>🌍 MapTaos</h1>
     <p class="subtitle">Liga de los MapTaos</p>
 
-    <div
-      class="player"
-      id="playerName"
-    ></div>
+   <div
+  class="player"
+  style="
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:6px;
+  "
+>
+  <span id="playerName"></span>
+
+  <span
+    id="btnEditarAliasCabecera"
+    role="button"
+    aria-label="Cambiar alias"
+    title="Cambiar alias"
+    style="
+      cursor:pointer;
+      font-size:16px;
+    "
+  >✏️</span>
+</div>
 
     <button
       type="button"
@@ -2553,55 +2571,61 @@ plugins: {
     await cargarTop20General();
   });
 
-document
-  document
-  .getElementById("btnEditarAlias")
-  .addEventListener("click", async () => {
+async function editarAlias() {
 
-    const nuevoAlias = prompt(
-      "Introduce tu nuevo alias:",
-      jugadorActual.alias || jugadorActual.nombre
-    );
+  const nuevoAlias = prompt(
+    "Introduce tu nuevo alias:",
+    jugadorActual.alias || jugadorActual.nombre
+  );
 
-    if (nuevoAlias === null) return;
+  if (nuevoAlias === null) return;
 
-    const aliasLimpio = nuevoAlias.trim();
+  const aliasLimpio = nuevoAlias.trim();
 
-    if (!aliasLimpio) {
-      alert("El alias no puede estar vacío.");
-      return;
-    }
-
-    const { error } =
-      await supabaseClient
-        .from("jugadores")
-        .update({
-          alias: aliasLimpio
-        })
-        .eq("id", jugadorActual.id);
-
-   if (error) {
-  if (error.code === "23505") {
-    alert(
-      "Ese alias ya está siendo utilizado por otro jugador. Elige otro."
-    );
-  } else {
-    alert(
-      "No se pudo cambiar el alias. Inténtalo de nuevo."
-    );
+  if (!aliasLimpio) {
+    alert("El alias no puede estar vacío.");
+    return;
   }
-  return;
+
+  const { error } =
+    await supabaseClient
+      .from("jugadores")
+      .update({
+        alias: aliasLimpio
+      })
+      .eq("id", jugadorActual.id);
+
+  if (error) {
+    if (error.code === "23505") {
+      alert(
+        "Ese alias ya está siendo utilizado por otro jugador. Elige otro."
+      );
+    } else {
+      alert(
+        "No se pudo cambiar el alias. Inténtalo de nuevo."
+      );
+    }
+    return;
+  }
+
+  jugadorActual.alias = aliasLimpio;
+
+  document.getElementById("playerName").textContent =
+    "👤 " + aliasLimpio;
+
+  document.getElementById("profileName").textContent =
+    "Perfil de " + aliasLimpio;
+
+  alert("Alias actualizado correctamente.");
 }
-    jugadorActual.alias = aliasLimpio;
 
-    document.getElementById("playerName").textContent =
-      "👤 " + aliasLimpio;
+document
+  .getElementById("btnEditarAlias")
+  .addEventListener("click", editarAlias);
 
-    document.getElementById("profileName").textContent =
-      "Perfil de " + aliasLimpio;
-
-    alert("Alias actualizado correctamente.");
-  });
+document
+  .getElementById("btnEditarAliasCabecera")
+  .addEventListener("click", editarAlias);
   
 function mostrarSeccionInicio(seccion) {
 
