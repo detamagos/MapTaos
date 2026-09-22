@@ -706,7 +706,7 @@ const lineaRondas =
   texto
     .split("\n")
     .find(linea =>
-      !/(?:www\.maptap\.gg|MapTap)\s+[A-Za-z]+\s+\d{1,2}/i.test(linea) &&
+      !/(?:www\.maptap\.gg|MapTap)\s+[\p{L}]+\s+\d{1,2}/iu.test(linea) &&
       !/Final score:/i.test(linea) &&
       /\d/.test(linea)
     );
@@ -738,7 +738,7 @@ if (
 const tieneBanderas = banderas.length === 5;
 const fechaMatch =
   texto.match(
-    /(?:www\.maptap\.gg|MapTap)\s+([A-Za-z]+)\s+(\d{1,2})/i
+    /(?:www\.maptap\.gg|MapTap)\s+([\p{L}]+)\s+(\d{1,2})/iu
   );
 
   if (!scoreMatch) {
@@ -782,24 +782,34 @@ const fechaMatch =
 const meses = {
   january: 0,
   enero: 0,
+  xaneiro: 0,
+  janeiro: 0,
 
   february: 1,
   febrero: 1,
+  febreiro: 1,
+  fevereiro: 1,
 
   march: 2,
   marzo: 2,
+  março: 2,
 
   april: 3,
   abril: 3,
 
   may: 4,
   mayo: 4,
+  maio: 4,
 
   june: 5,
   junio: 5,
+  xuño: 5,
+  junho: 5,
 
   july: 6,
   julio: 6,
+  xullo: 6,
+  julho: 6,
 
   august: 7,
   agosto: 7,
@@ -807,15 +817,20 @@ const meses = {
   september: 8,
   septiembre: 8,
   setiembre: 8,
+  setembro: 8,
 
   october: 9,
   octubre: 9,
+  outubro: 9,
 
   november: 10,
   noviembre: 10,
+  novembro: 10,
 
   december: 11,
-  diciembre: 11
+  diciembre: 11,
+  decembro: 11,
+  dezembro: 11
 };
   const mesTexto =
     fechaMatch[1].toLowerCase();
@@ -836,27 +851,23 @@ const hoy =
   new Date();
 
 let año =
-  hoy.getUTCFullYear();
+  hoy.getFullYear();
 
-  let fecha =
-    new Date(
-      año,
-      mes,
-      dia,
-      12,
-      0,
-      0
-    );
+const mesActual =
+  hoy.getMonth();
 
-  const diferenciaDias =
-    (
-      fecha.getTime() -
-      hoy.getTime()
-    ) / 86400000;
-
-  if (diferenciaDias > 30) {
-    año = año - 1;
-  }
+if (
+  mes === 11 &&
+  mesActual === 0
+) {
+  año = año - 1;
+}
+else if (
+  mes === 0 &&
+  mesActual === 11
+) {
+  año = año + 1;
+}
 
   const fechaSQL =
     año
@@ -931,6 +942,45 @@ pasteResultButton.addEventListener(
 
     limpiarMensaje();
 
+    const fechasHoy =
+      fechasValidasHoy();
+
+    const {
+      data: resultadosHoy,
+      error: errorResultadosHoy
+    } =
+      await supabaseClient
+        .from("resultados")
+        .select("id")
+        .eq(
+          "jugador_id",
+          jugadorActual.id
+        )
+        .in(
+          "fecha",
+          fechasHoy
+        )
+        .limit(1);
+
+    if (errorResultadosHoy) {
+      mostrarMensaje(
+        "No se pudo comprobar si ya tienes resultado.",
+        "error"
+      );
+      return;
+    }
+
+    if (
+      resultadosHoy &&
+      resultadosHoy.length > 0
+    ) {
+      mostrarMensaje(
+        "Ya has guardado tu resultado de hoy.",
+        "error"
+      );
+      return;
+    }
+    
     try {
 
       const texto =
@@ -993,13 +1043,20 @@ saveResultButton.addEventListener(
       return;
     }
 
-const hoy = fechaMadridISO();
+const fechasHoy =
+  fechasValidasHoy();
 
-if (resultadoPendiente.fechaSQL !== hoy) {
+if (
+  !fechasHoy.includes(
+    resultadoPendiente.fechaSQL
+  )
+) {
   mostrarMensaje(
     "Solo puedes guardar el resultado del día actual.",
     "error"
   );
+  return;
+}
   return;
 }
     
@@ -1176,6 +1233,25 @@ function fechaMadridISO(fecha = new Date()) {
   return fecha.toISOString().slice(0, 10);
 }
 
+function fechasValidasHoy(fecha = new Date()) {
+
+  const hoyLocal =
+    fecha.getFullYear()
+    + "-"
+    + String(fecha.getMonth() + 1).padStart(2, "0")
+    + "-"
+    + String(fecha.getDate()).padStart(2, "0");
+
+  const hoyUTC =
+    fecha.getUTCFullYear()
+    + "-"
+    + String(fecha.getUTCMonth() + 1).padStart(2, "0")
+    + "-"
+    + String(fecha.getUTCDate()).padStart(2, "0");
+
+  return [...new Set([hoyLocal, hoyUTC])];
+}
+  
 function banderaACodigo(bandera) {
   if (!bandera) return "";
 
