@@ -305,10 +305,10 @@
       id="manualCard"
     >
 
-      <p class="small">
-        Chrome no pudo leer el portapapeles automáticamente.
-        Pega aquí el resultado de MapTap.
-      </p>
+    <p class="small">
+      Pega aquí tu resultado de MapTap y pulsa
+      <strong>Analizar resultado</strong>.
+    </p>
 
       <textarea
         id="manualText"
@@ -779,21 +779,44 @@ const fechaMatch =
     );
   }
     
-  const meses = {
-    january: 0,
-    february: 1,
-    march: 2,
-    april: 3,
-    may: 4,
-    june: 5,
-    july: 6,
-    august: 7,
-    september: 8,
-    october: 9,
-    november: 10,
-    december: 11
-  };
+const meses = {
+  january: 0,
+  enero: 0,
 
+  february: 1,
+  febrero: 1,
+
+  march: 2,
+  marzo: 2,
+
+  april: 3,
+  abril: 3,
+
+  may: 4,
+  mayo: 4,
+
+  june: 5,
+  junio: 5,
+
+  july: 6,
+  julio: 6,
+
+  august: 7,
+  agosto: 7,
+
+  september: 8,
+  septiembre: 8,
+  setiembre: 8,
+
+  october: 9,
+  octubre: 9,
+
+  november: 10,
+  noviembre: 10,
+
+  december: 11,
+  diciembre: 11
+};
   const mesTexto =
     fechaMatch[1].toLowerCase();
 
