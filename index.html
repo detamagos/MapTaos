@@ -1461,9 +1461,13 @@ if (filaAnterior) {
       justify-content:space-between;
       align-items:center;
     ">
-      <span>
-        ${medalla}
-        ${fila.posicion}.
+<span>
+  <span style="
+    display:inline-block;
+    width:22px;
+    text-align:center;
+  ">${medalla}</span>
+  ${fila.posicion}.
 <strong
   style="cursor:pointer;"
 onclick="abrirPerfilJugador(${fila.jugador_id}, '${fila.alias || fila.nombre}')"
