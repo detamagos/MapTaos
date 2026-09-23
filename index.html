@@ -2588,6 +2588,13 @@ async function editarAlias() {
     return;
   }
 
+  if (aliasLimpio.length > 15) {
+    alert(
+      "El alias puede tener un máximo de 15 caracteres."
+    );
+    return;
+  }
+  
   const { error } =
     await supabaseClient
       .from("jugadores")
