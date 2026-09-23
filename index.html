@@ -1410,7 +1410,7 @@ if (parcialJugador) {
         if (puntosRonda === null) {
           return "";
         }
-
+puntosRonda = 100;
 const bandera =
   banderas[i] || "";
 
@@ -1420,11 +1420,11 @@ const codigoPais =
 return codigoPais
   ? `<span style="white-space:nowrap;"><img src="https://flagcdn.com/20x15/${codigoPais.toLowerCase()}.png"
        alt="${codigoPais}"
-       style="width:20px;height:15px;vertical-align:middle;margin-right:3px;">${puntosRonda}</span>`
+       style="width:20px;height:15px;vertical-align:middle;margin-right:1px;">${puntosRonda}</span>`
   : `<span style="white-space:nowrap;">${puntosRonda}</span>`;
       })
       .filter(Boolean)
-      .join(" · ");
+      .join("·");
            }
   
   const filaAnterior =
