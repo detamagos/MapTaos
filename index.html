@@ -2361,22 +2361,40 @@ function mostrarTop20(top20, rondasPorFecha, errorTop20) {
           ]
         : [];
 
-      const textoRondas = puntos
-        .map((puntosRonda, j) => {
+const textoRondas = puntos
+  .map((puntosRonda, j) => {
 
-          if (puntosRonda === null) return "";
+    if (puntosRonda === null) return "";
 
-          const codigoPais =
-            banderaACodigo(banderas[j] || "");
+    const codigoPais =
+      banderaACodigo(banderas[j] || "");
 
-          return codigoPais
-            ? `<img src="https://flagcdn.com/20x15/${codigoPais.toLowerCase()}.png"
-                 alt="${codigoPais}"
-                 style="width:20px;height:15px;vertical-align:middle;margin-right:3px;"> ${puntosRonda}`
-            : `${puntosRonda}`;
-        })
-        .filter(Boolean)
-        .join(" · ");
+    return codigoPais
+      ? `<span style="
+           display:inline-flex;
+           align-items:center;
+           width:20%;
+           white-space:nowrap;
+           box-sizing:border-box;
+         "><img
+           src="https://flagcdn.com/20x15/${codigoPais.toLowerCase()}.png"
+           alt="${codigoPais}"
+           style="
+             width:20px;
+             height:15px;
+             vertical-align:middle;
+             margin-right:1px;
+           ">${puntosRonda}</span>`
+      : `<span style="
+           display:inline-flex;
+           align-items:center;
+           width:20%;
+           white-space:nowrap;
+           box-sizing:border-box;
+         ">${puntosRonda}</span>`;
+  })
+  .filter(Boolean)
+  .join("");
 
      return `
   <div style="padding:8px 0; border-bottom:1px solid #ddd;">
@@ -2423,14 +2441,13 @@ function mostrarTop20(top20, rondasPorFecha, errorTop20) {
     </span>
   </div>
 
-  <div style="
-    margin-top:4px;
-    font-size:13px;
-    text-align:right;
-    white-space:nowrap;
-  ">
-    ${textoRondas}
-  </div>
+<div style="
+  margin-top:4px;
+  font-size:13px;
+  width:100%;
+">
+  ${textoRondas}
+</div>
 
   </div>
 `;
