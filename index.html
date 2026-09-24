@@ -1436,28 +1436,46 @@ if (parcialJugador) {
       ]
     : [];
 
-  textoRondas =
-    puntos
-      .map((puntosRonda, i) => {
+textoRondas =
+  puntos
+    .map((puntosRonda, i) => {
 
-        if (puntosRonda === null) {
-          return "";
-        }
+      if (puntosRonda === null) {
+        return "";
+      }
 
-const bandera =
-  banderas[i] || "";
+      const bandera =
+        banderas[i] || "";
 
-const codigoPais =
-  banderaACodigo(bandera);
+      const codigoPais =
+        banderaACodigo(bandera);
 
-return codigoPais
-  ? `<span style="white-space:nowrap;"><img src="https://flagcdn.com/20x15/${codigoPais.toLowerCase()}.png"
-       alt="${codigoPais}"
-       style="width:20px;height:15px;vertical-align:middle;margin-right:1px;">${puntosRonda}</span>`
-  : `<span style="white-space:nowrap;">${puntosRonda}</span>`;
-      })
-      .filter(Boolean)
-      .join("·");
+      return codigoPais
+        ? `<span style="
+             display:inline-flex;
+             align-items:center;
+             width:20%;
+             white-space:nowrap;
+             box-sizing:border-box;
+           "><img
+             src="https://flagcdn.com/20x15/${codigoPais.toLowerCase()}.png"
+             alt="${codigoPais}"
+             style="
+               width:20px;
+               height:15px;
+               vertical-align:middle;
+               margin-right:1px;
+             ">${puntosRonda}</span>`
+        : `<span style="
+             display:inline-flex;
+             align-items:center;
+             width:20%;
+             white-space:nowrap;
+             box-sizing:border-box;
+           ">${puntosRonda}</span>`;
+    })
+    .filter(Boolean)
+    .join("");
            }
   
   const filaAnterior =
@@ -1527,6 +1545,7 @@ onclick="abrirPerfilJugador(${fila.jugador_id}, '${fila.alias || fila.nombre}')"
             margin-top:6px;
             font-size:13px;
             color:#666;
+            width:100%;
           ">
             ${textoRondas}
           </div>
