@@ -318,11 +318,32 @@
 
 
     <!-- PEGADO MANUAL DE RESPALDO -->
-    <div
-      class="card hidden"
-      id="manualCard"
-    >
+<div
+  class="card hidden"
+  id="manualCard"
+  style="position:relative;"
+>
 
+  <button
+    type="button"
+    id="closeManualButton"
+    aria-label="Cerrar"
+    title="Cerrar"
+    style="
+      position:absolute;
+      top:8px;
+      right:8px;
+      width:auto;
+      padding:2px 7px;
+      margin:0;
+      border:none;
+      background:transparent;
+      font-size:20px;
+      line-height:1;
+      cursor:pointer;
+    "
+  >✕</button>
+  
     <p class="small">
       Pega aquí tu resultado de MapTap y pulsa
       <strong>Analizar resultado</strong>.
@@ -1214,6 +1235,18 @@ cancelButton.addEventListener(
   }
 );
 
+  document
+  .getElementById("closeManualButton")
+  .addEventListener("click", () => {
+
+    manualText.value = "";
+
+    manualCard
+      .classList
+      .add("hidden");
+
+    limpiarMensaje();
+  });
 
 function mostrarMensaje(
   texto,
