@@ -439,6 +439,17 @@
 
 </div>
 
+<button
+  type="button"
+  id="btnContinentes"
+  style="
+    width:100%;
+    margin-top:8px;
+  "
+>
+  🌍 Continentes
+</button>
+    
 <div class="card" id="seccionHoy">
   <h2 class="home-section-title">
     Clasificación de hoy
@@ -477,6 +488,18 @@
   <div id="profileTop20" class="placeholder">
     Cargando mejores resultados...
   </div>
+</div>
+
+<div class="card hidden" id="seccionContinentes">
+
+  <h2 class="home-section-title">
+    🌍 Rankings por continentes
+  </h2>
+
+  <div id="rankingContinentes">
+    Cargando rankings...
+  </div>
+
 </div>
     
   </section>
@@ -1233,6 +1256,7 @@ if (resultadoPendiente.tieneBanderas) {
     await cargarRankingSemanal();
     await cargarRankingMensual();
     await cargarTop20General();
+    await cargarRankingContinentes();
     
     resultadoPendiente = null;
   }
@@ -1952,6 +1976,134 @@ async function cargarRankingMensual() {
     }).join("");
 }
 
+async function cargarRankingContinentes() {
+
+  const contenedor =
+    document.getElementById("rankingContinentes");
+
+  const { data, error } =
+    await supabaseClient
+      .from("ranking_continentes")
+      .select(
+        "continente, posicion, jugador_id, nombre, alias, rondas_jugadas, porcentaje"
+      )
+      .order("continente", { ascending: true })
+      .order("posicion", { ascending: true });
+
+  if (error) {
+    console.error(error);
+    contenedor.innerHTML =
+      "No se pudieron cargar los rankings por continentes.";
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    contenedor.innerHTML =
+      "Todavía no hay datos por continentes.";
+    return;
+  }
+const continentes = [
+  "África",
+  "América",
+  "Asia",
+  "Europa",
+  "Oceanía"
+];
+
+contenedor.innerHTML =
+  continentes.map(continente => {
+
+    const jugadores =
+      data.filter(
+        fila => fila.continente === continente
+      );
+
+    const primeros =
+      jugadores.slice(0, 5);
+
+    const filas =
+      primeros.map(fila => {
+
+        let medalla = "";
+
+        if (fila.posicion === 1) {
+          medalla = "🥇";
+        }
+        else if (fila.posicion === 2) {
+          medalla = "🥈";
+        }
+        else if (fila.posicion === 3) {
+          medalla = "🥉";
+        }
+
+        const nombre =
+          fila.alias || fila.nombre;
+
+        return `
+          <div style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            padding:7px 0;
+            border-bottom:1px solid #ddd;
+          ">
+
+            <span>
+              <span style="
+                display:inline-block;
+                width:28px;
+                text-align:center;
+              ">${medalla}</span>
+
+              ${fila.posicion}
+
+              <strong
+                onclick="abrirPerfilJugador(${fila.jugador_id}, '${nombre}')"
+                style="cursor:pointer;"
+              >
+                ${nombre}
+              </strong>
+            </span>
+
+            <span style="white-space:nowrap;">
+              <strong>${fila.porcentaje} %</strong>
+              <span style="
+                font-size:12px;
+                color:#777;
+              ">
+                · ${fila.rondas_jugadas}
+                ${fila.rondas_jugadas === 1 ? "ronda" : "rondas"}
+              </span>
+            </span>
+
+          </div>
+        `;
+      })
+      .join("");
+
+    return `
+      <div style="
+        background:#eef1f3;
+        border-radius:12px;
+        padding:12px;
+        margin-bottom:14px;
+      ">
+
+        <h3 style="
+          margin:0 0 6px 0;
+        ">
+          ${continente}
+        </h3>
+
+        ${filas}
+
+      </div>
+    `;
+  })
+  .join("");
+}
+  
+  
 async function cargarTop20General() {
 
   const { data: top20General, error: errorTop20 } =
@@ -2674,6 +2826,7 @@ plugins: {
     await cargarRankingSemanal();
     await cargarRankingMensual();
     await cargarTop20General();
+    await cargarRankingContinentes();
   });
 
 async function editarAlias() {
@@ -2732,6 +2885,7 @@ async function editarAlias() {
   await cargarRankingSemanal();
   await cargarRankingMensual();
   await cargarTop20General();
+  await cargarRankingContinentes();
 
   alert("Alias actualizado correctamente.");
 }
@@ -2751,6 +2905,7 @@ function mostrarSeccionInicio(seccion) {
     semana: "seccionSemana",
     mes: "seccionMes",
     top20: "seccionTop20"
+    continentes: "seccionContinentes"
   };
 
 const botones = {
@@ -2758,6 +2913,7 @@ const botones = {
   semana: "btnSemana",
   mes: "btnMes",
   top20: "btnTop20"
+  continentes: "btnContinentes"
 };
 
 Object.values(botones).forEach(id => {
@@ -2803,6 +2959,10 @@ document
   .addEventListener("click", () => mostrarSeccionInicio("top20"));
 
 document
+  .getElementById("btnContinentes")
+  .addEventListener("click", () => mostrarSeccionInicio("continentes"));
+  
+document
   .getElementById("logoutButton")
   .addEventListener("click", async () => {
 
@@ -2836,6 +2996,8 @@ async function iniciarApp() {
   await cargarRankingMensual();
 
   await cargarTop20General();
+
+  await cargarRankingContinentes();
 }
   
 async function comprobarSesion() {
