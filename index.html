@@ -1528,7 +1528,11 @@ if (filaAnterior) {
       align-items:center;
     ">
 <span>
-  ${medalla}
+  <span style="
+    display:inline-block;
+    width:28px;
+    text-align:center;
+  ">${medalla}</span>
   ${fila.posicion}
 <strong
 
@@ -1727,13 +1731,17 @@ lunesAnterior.setUTCDate(
             align-items:center;
           ">
 
-            <span>
-              ${medalla}
-              ${fila.posicion}
-              <strong
-onclick="abrirPerfilJugador(${fila.jugador_id}, '${fila.alias || fila.nombre}')"
-style="cursor:pointer;"
->
+          <span>
+            <span style="
+              display:inline-block;
+              width:28px;
+              text-align:center;
+            ">${medalla}</span>
+            ${fila.posicion}
+            <strong
+            onclick="abrirPerfilJugador(${fila.jugador_id}, '${fila.alias || fila.nombre}')"
+            style="cursor:pointer;"
+            >
   ${fila.alias || fila.nombre}
 </strong>
 
@@ -1900,13 +1908,13 @@ async function cargarRankingMensual() {
             align-items:center;
           ">
 
-            <span>
-              ${medalla}
-              ${fila.posicion}
-              <strong
-onclick="abrirPerfilJugador(${fila.jugador_id}, '${fila.alias || fila.nombre}')"
-style="cursor:pointer;"
->
+          <span>
+            ${medalla}
+            ${fila.posicion}
+            <strong
+            onclick="abrirPerfilJugador(${fila.jugador_id}, '${fila.alias || fila.nombre}')"
+            style="cursor:pointer;"
+            >
   ${fila.alias || fila.nombre}
 </strong>
 
