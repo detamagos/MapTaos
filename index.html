@@ -1556,14 +1556,15 @@ onclick="abrirPerfilJugador(${fila.jugador_id}, '${fila.alias || fila.nombre}')"
     ${
       textoRondas
         ? `
-          <div style="
-            margin-top:6px;
-            font-size:13px;
-            color:#666;
-            width:100%;
-          ">
-            ${textoRondas}
-          </div>
+    <div style="
+      margin-top:6px;
+      margin-left:28px;
+      font-size:13px;
+      color:#666;
+      width:calc(100% - 28px);
+    ">
+      ${textoRondas}
+    </div>
         `
         : ""
     }
