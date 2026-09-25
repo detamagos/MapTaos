@@ -1909,7 +1909,11 @@ async function cargarRankingMensual() {
           ">
 
           <span>
-            ${medalla}
+            <span style="
+              display:inline-block;
+              width:28px;
+              text-align:center;
+            ">${medalla}</span>
             ${fila.posicion}
             <strong
             onclick="abrirPerfilJugador(${fila.jugador_id}, '${fila.alias || fila.nombre}')"
