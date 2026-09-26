@@ -1928,6 +1928,12 @@ async function cargarRankingMensual() {
         { ascending: true }
       );
 
+  const { data: resultadosHistoricos } =
+    await supabaseClient
+      .from("resultados")
+      .select("jugador_id, fecha")
+      .order("fecha", { ascending: true });
+  
 
   if (errorActual) {
 
@@ -1988,6 +1994,50 @@ async function cargarRankingMensual() {
         }
       }
 
+    const mediaMes =
+      Math.round(
+        Number(fila.puntos) /
+        Number(fila.dias_jugados)
+      );
+    
+    const resultadosJugador =
+      (resultadosHistoricos || [])
+        .filter(
+          resultado =>
+            resultado.jugador_id === fila.jugador_id
+        );
+    
+    let racha = resultadosJugador.length > 0 ? 1 : 0;
+    
+    for (
+      let i = resultadosJugador.length - 1;
+      i > 0;
+      i--
+    ) {
+    
+      const fechaActual =
+        new Date(
+          resultadosJugador[i].fecha + "T00:00:00"
+        );
+    
+      const fechaAnterior =
+        new Date(
+          resultadosJugador[i - 1].fecha + "T00:00:00"
+        );
+    
+      const diferenciaDias =
+        Math.round(
+          (fechaActual - fechaAnterior) /
+          (1000 * 60 * 60 * 24)
+        );
+    
+      if (diferenciaDias === 1) {
+        racha++;
+      }
+      else {
+        break;
+      }
+    }
 
       return `
         <div style="
@@ -2031,11 +2081,15 @@ async function cargarRankingMensual() {
 
           <div style="
             margin-top:5px;
-            font-size:13px;
+            margin-left:40px;
+            font-size:12px;
             color:#666;
           ">
-            ${fila.dias_jugados}
-            ${fila.dias_jugados === 1 ? "día jugado" : "días jugados"}
+            📊 <strong>${mediaMes}</strong>
+            &nbsp;·&nbsp;
+            🎮 <strong>${fila.dias_jugados}</strong>
+            &nbsp;·&nbsp;
+            🔥 <strong>${racha}</strong>
           </div>
 
         </div>
