@@ -2511,7 +2511,7 @@ contenedor.innerHTML = ranking
 
         <div style="
           margin-top:5px;
-          margin-left:58px;
+          margin-left:66px;
           font-size:12px;
           color:#666;
         ">
@@ -2526,7 +2526,17 @@ contenedor.innerHTML = ranking
     `;
   })
   .join("");
-  
+
+contenedor.innerHTML = `
+  <div style="
+    background:#eef1f3;
+    border-radius:12px;
+    padding:10px;
+  ">
+    ${contenedor.innerHTML}
+  </div>
+`;
+
 }
   
   
