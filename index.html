@@ -452,8 +452,19 @@
 </button>
     
 <div class="card" id="seccionHoy">
-  <h2 class="home-section-title">
-    Clasificación de hoy
+  <h2 class="home-section-title" style="
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  ">
+    <span>Clasificación de hoy</span>
+  
+    <span id="contadorJugadoresHoy" style="
+      font-size:13px;
+      font-weight:500;
+      color:#777;
+      white-space:nowrap;
+    "></span>
   </h2>
 
   <div id="rankingHoy" class="placeholder">
@@ -1398,6 +1409,25 @@ async function cargarRankingHoy() {
     .order("fecha", {
       ascending: false
     });
+
+  const {
+    count: totalJugadores
+  } =
+    await supabaseClient
+      .from("jugadores")
+      .select("*", {
+        count: "exact",
+        head: true
+      })
+      .eq("activo", true);
+  
+  const contadorJugadoresHoy =
+    document.getElementById("contadorJugadoresHoy");
+  
+  if (contadorJugadoresHoy) {
+    contadorJugadoresHoy.textContent =
+      `${data?.length || 0}/${totalJugadores || 0} jugadores`;
+  }
   
   if (error) {
 
