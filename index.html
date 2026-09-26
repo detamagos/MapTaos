@@ -517,8 +517,8 @@
 </div>
 
 <div class="card" id="seccionTop20">
-  <h2 class="home-section-title">
-  Clasificación Top-20 general
+<h2 class="home-section-title" id="tituloTop20">
+  🔥 Top-20
 </h2>
 
   <div id="profileTop20" class="placeholder">
@@ -2644,7 +2644,45 @@ contenedor.innerHTML = `
   
   
 async function cargarTop20General() {
+  const hoy = fechaMadridISO();
 
+  const [anio, mes] =
+    hoy.split("-").map(Number);
+
+  const mesInicioTrimestre =
+    Math.floor((mes - 1) / 3) * 3 + 1;
+
+  const inicioTrimestre =
+    `${anio}-${String(mesInicioTrimestre).padStart(2, "0")}-01`;
+
+  const nombresMeses = [
+    "Ene", "Feb", "Mar", "Abr",
+    "May", "Jun", "Jul", "Ago",
+    "Sep", "Oct", "Nov", "Dic"
+  ];
+  
+  const mesFinTrimestre =
+    mesInicioTrimestre + 2;
+  
+  const tituloTop20 =
+    document.getElementById("tituloTop20");
+  
+  if (tituloTop20) {
+    tituloTop20.textContent =
+      `🔥 Top-20 · ${nombresMeses[mesInicioTrimestre - 1]}–${nombresMeses[mesFinTrimestre - 1]}`;
+  }
+    
+  let anioFin = anio;
+  let mesSiguienteTrimestre =
+    mesInicioTrimestre + 3;
+
+  if (mesSiguienteTrimestre > 12) {
+    mesSiguienteTrimestre = 1;
+    anioFin++;
+  }
+
+  const inicioSiguienteTrimestre =
+    `${anioFin}-${String(mesSiguienteTrimestre).padStart(2, "0")}-01`;
   const { data: top20General, error: errorTop20 } =
     await supabaseClient
       .from("resultados")
@@ -2659,6 +2697,8 @@ async function cargarTop20General() {
         ronda_5,
         jugadores(nombre, alias)
       `)
+      .gte("fecha", inicioTrimestre)
+      .lt("fecha", inicioSiguienteTrimestre)
       .order("final_score", { ascending: false })
       .limit(20);
 
