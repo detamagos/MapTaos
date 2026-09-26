@@ -2092,16 +2092,28 @@ async function cargarRankingMensual() {
           </div>
 
           <div style="
+            display:flex;
             margin-top:5px;
-            padding-left:48px;
             font-size:12px;
             color:#666;
           ">
-            📊 <strong>${mediaMes}</strong>
-            &nbsp;·&nbsp;
-            🎮 <strong>${fila.dias_jugados}</strong>
-            &nbsp;·&nbsp;
-            🔥 <strong>${racha}</strong>
+            <span style="
+              width:28px;
+              flex-shrink:0;
+            "></span>
+          
+            <span style="
+              width:20px;
+              flex-shrink:0;
+            "></span>
+          
+            <span>
+              📊 <strong>${mediaMes}</strong>
+              &nbsp;·&nbsp;
+              🎮 <strong>${fila.dias_jugados}</strong>
+              &nbsp;·&nbsp;
+              🔥 <strong>${racha}</strong>
+            </span>
           </div>
 
         </div>
