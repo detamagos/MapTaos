@@ -1106,6 +1106,31 @@ pasteResultButton.addEventListener(
       );
       return;
     }
+
+    const esIOS =
+      /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+      (
+        navigator.platform === "MacIntel" &&
+        navigator.maxTouchPoints > 1
+      );
+
+    if (esIOS) {
+    
+      manualCard
+        .classList
+        .remove("hidden");
+    
+      manualText.value = "";
+    
+      manualText.focus();
+    
+      mostrarMensaje(
+        "Pega aquí el resultado copiado de MapTap.",
+        "info"
+      );
+    
+      return;
+}
     
     try {
 
