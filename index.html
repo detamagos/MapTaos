@@ -2013,17 +2013,19 @@ const continentes = [
 
 contenedor.innerHTML =
   continentes.map(continente => {
-
+  const claveContinente =
+    continente
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
+    
     const jugadores =
       data.filter(
         fila => fila.continente === continente
       );
 
-    const primeros =
-      jugadores.slice(0, 5);
-
     const filas =
-      primeros.map(fila => {
+      jugadores.map((fila, indice) => {
 
         let medalla = "";
 
@@ -2041,7 +2043,10 @@ contenedor.innerHTML =
           fila.alias || fila.nombre;
 
         return `
-          <div style="
+          <div
+          class="${indice >= 5 ? `extra-${claveContinente}` : ""}"
+          style="
+            ${indice >= 5 ? "display:none;" : ""}
             display:flex;
             justify-content:space-between;
             align-items:center;
@@ -2122,11 +2127,49 @@ contenedor.innerHTML =
 </div>
         
         ${filas}
-
+      ${jugadores.length > 5
+  ? `
+    <button
+      type="button"
+      onclick="toggleContinente('${claveContinente}', this)"
+      style="
+        margin-top:8px;
+        width:100%;
+        border:none;
+        background:transparent;
+        font-weight:600;
+        cursor:pointer;
+      "
+    >
+      Mostrar más
+    </button>
+  `
+  : ""
+}
       </div>
     `;
   })
   .join("");
+}
+
+
+function toggleContinente(continente, boton) {
+
+  const filas =
+    document.querySelectorAll(
+      `.extra-${continente}`
+    );
+
+  const mostrar =
+    boton.textContent.trim() === "Más";
+
+  filas.forEach(fila => {
+    fila.style.display =
+      mostrar ? "flex" : "none";
+  });
+
+  boton.textContent =
+    mostrar ? "Menos" : "Más";
 }
   
   
