@@ -199,7 +199,8 @@
       #seccionSemana,
       #seccionMes,
       #seccionTop20,
-      #seccionContinentes {
+      #seccionContinentes,
+      #seccionMejoresMarcas {
         padding-left: 8px;
         padding-right: 8px;
       }
@@ -440,16 +441,29 @@
 
 </div>
 
-<button
-  type="button"
-  id="btnContinentes"
-  style="
-    width:100%;
-    margin-top:8px;
-  "
->
-  🌍 Continentes
-</button>
+<div style="
+  display:flex;
+  gap:8px;
+  margin-top:8px;
+">
+
+  <button
+    type="button"
+    id="btnContinentes"
+    style="flex:1;"
+  >
+    🌍 Continentes
+  </button>
+
+  <button
+    type="button"
+    id="btnMejoresMarcas"
+    style="flex:1;"
+  >
+    🏅 Mejores marcas
+  </button>
+
+</div>
     
 <div class="card" id="seccionHoy">
   <h2 class="home-section-title" style="
@@ -510,6 +524,18 @@
 
   <div id="rankingContinentes">
     Cargando rankings...
+  </div>
+
+</div>
+
+<div class="card hidden" id="seccionMejoresMarcas">
+
+  <h2 class="home-section-title">
+    🏅 Ranking mejores marcas
+  </h2>
+
+  <div id="rankingMejoresMarcas" class="placeholder">
+    Cargando mejores marcas...
   </div>
 
 </div>
@@ -1269,6 +1295,7 @@ if (resultadoPendiente.tieneBanderas) {
     await cargarRankingMensual();
     await cargarTop20General();
     await cargarRankingContinentes();
+    await cargarMejoresMarcas();
     
     resultadoPendiente = null;
   }
@@ -2202,6 +2229,295 @@ function toggleContinente(continente, boton) {
   boton.textContent =
     mostrar ? "Menos" : "Más";
 }
+
+  
+async function cargarMejoresMarcas() {
+
+  const contenedor =
+    document.getElementById("rankingMejoresMarcas");
+
+  const { data: resultados, error } =
+    await supabaseClient
+      .from("resultados")
+      .select(`
+        fecha,
+        final_score,
+        jugador_id,
+        ronda_1,
+        ronda_2,
+        ronda_3,
+        ronda_4,
+        ronda_5,
+        jugadores(nombre, alias, activo)
+      `)
+      .order("fecha", { ascending: true });
+
+  if (error) {
+    console.error(error);
+
+    contenedor.innerHTML =
+      "No se pudo cargar el ranking de mejores marcas.";
+
+    return;
+  }
+
+  if (!resultados || resultados.length === 0) {
+    contenedor.innerHTML =
+      "Todavía no hay resultados.";
+
+    return;
+  }
+
+  const { data: rondasPorFecha } =
+    await supabaseClient
+      .from("rondas_dia")
+      .select(
+        "fecha, pais_1, pais_2, pais_3, pais_4, pais_5"
+      );
+  const porJugador = {};
+
+resultados.forEach(fila => {
+
+  if (!fila.jugadores?.activo) {
+    return;
+  }
+
+  if (!porJugador[fila.jugador_id]) {
+    porJugador[fila.jugador_id] = [];
+  }
+
+  porJugador[fila.jugador_id].push(fila);
+});
+
+const ranking = Object.values(porJugador)
+  .map(partidasJugador => {
+
+    const partidas = partidasJugador.length;
+
+    const totalPuntos =
+      partidasJugador.reduce(
+        (suma, fila) =>
+          suma + Number(fila.final_score),
+        0
+      );
+
+    const media =
+      Math.round(totalPuntos / partidas);
+
+    const mejorResultado =
+      partidasJugador.reduce(
+        (mejor, fila) =>
+          Number(fila.final_score) >
+          Number(mejor.final_score)
+            ? fila
+            : mejor
+      );
+
+    let racha = 1;
+
+    for (
+      let i = partidasJugador.length - 1;
+      i > 0;
+      i--
+    ) {
+
+      const fechaActual =
+        new Date(
+          partidasJugador[i].fecha + "T00:00:00"
+        );
+
+      const fechaAnterior =
+        new Date(
+          partidasJugador[i - 1].fecha + "T00:00:00"
+        );
+
+      const diferenciaDias =
+        Math.round(
+          (fechaActual - fechaAnterior) /
+          (1000 * 60 * 60 * 24)
+        );
+
+      if (diferenciaDias === 1) {
+        racha++;
+      }
+      else {
+        break;
+      }
+    }
+
+    return {
+      jugador_id: mejorResultado.jugador_id,
+      nombre:
+        mejorResultado.jugadores.alias ||
+        mejorResultado.jugadores.nombre,
+      mejor: Number(mejorResultado.final_score),
+      fecha: mejorResultado.fecha,
+      media,
+      partidas,
+      racha,
+      resultado: mejorResultado
+    };
+  })
+  .sort((a, b) => {
+
+    if (b.mejor !== a.mejor) {
+      return b.mejor - a.mejor;
+    }
+
+    return a.fecha.localeCompare(b.fecha);
+  });
+
+contenedor.innerHTML = ranking
+  .map((fila, i) => {
+
+    const fecha =
+      new Date(fila.fecha + "T00:00:00")
+        .toLocaleDateString("es-ES");
+
+    const rondasDia =
+      rondasPorFecha?.find(
+        ronda => ronda.fecha === fila.fecha
+      );
+
+    const puntos = [
+      fila.resultado.ronda_1,
+      fila.resultado.ronda_2,
+      fila.resultado.ronda_3,
+      fila.resultado.ronda_4,
+      fila.resultado.ronda_5
+    ];
+
+    const banderas = rondasDia
+      ? [
+          rondasDia.pais_1,
+          rondasDia.pais_2,
+          rondasDia.pais_3,
+          rondasDia.pais_4,
+          rondasDia.pais_5
+        ]
+      : [];
+
+    const textoRondas = puntos
+      .map((puntosRonda, j) => {
+
+        if (puntosRonda === null) {
+          return "";
+        }
+
+        const codigoPais =
+          banderaACodigo(banderas[j] || "");
+
+        return codigoPais
+          ? `<span style="
+               display:inline-flex;
+               align-items:center;
+               width:20%;
+               white-space:nowrap;
+               box-sizing:border-box;
+             "><img
+               src="https://flagcdn.com/20x15/${codigoPais.toLowerCase()}.png"
+               alt="${codigoPais}"
+               style="
+                 width:20px;
+                 height:15px;
+                 vertical-align:middle;
+                 margin-right:1px;
+               ">${puntosRonda}</span>`
+          : `<span style="
+               display:inline-flex;
+               align-items:center;
+               width:20%;
+               white-space:nowrap;
+               box-sizing:border-box;
+             ">${puntosRonda}</span>`;
+      })
+      .filter(Boolean)
+      .join("");
+
+    return `
+      <div style="
+        padding:8px 0;
+        border-bottom:1px solid #ddd;
+      ">
+
+        <div style="
+          display:flex;
+          justify-content:space-between;
+          align-items:center;
+          gap:8px;
+        ">
+
+          <div style="
+            display:flex;
+            align-items:center;
+            min-width:0;
+            white-space:nowrap;
+          ">
+
+            <span style="
+              display:inline-block;
+              width:16px;
+            ">
+              ${i + 1}
+            </span>
+
+            <strong style="
+              display:inline-block;
+              width:42px;
+            ">
+              ${fila.mejor}
+            </strong>
+
+            <strong
+              onclick="abrirPerfilJugador(${fila.jugador_id}, '${fila.nombre}')"
+              style="
+                cursor:pointer;
+                white-space:nowrap;
+              "
+            >
+              ${fila.nombre}
+            </strong>
+
+          </div>
+
+          <span style="
+            font-size:12px;
+            color:#777;
+            white-space:nowrap;
+          ">
+            ${fecha}
+          </span>
+
+        </div>
+
+        <div style="
+          margin-top:4px;
+          margin-left:58px;
+          font-size:13px;
+          width:calc(100% - 58px);
+        ">
+          ${textoRondas}
+        </div>
+
+        <div style="
+          margin-top:5px;
+          margin-left:58px;
+          font-size:12px;
+          color:#666;
+        ">
+          📊 <strong>${fila.media}</strong>
+          &nbsp;·&nbsp;
+          🎮 <strong>${fila.partidas}</strong> días
+          &nbsp;·&nbsp;
+          🔥 <strong>${fila.racha}</strong>
+        </div>
+
+      </div>
+    `;
+  })
+  .join("");
+  
+}
   
   
 async function cargarTop20General() {
@@ -2927,6 +3243,7 @@ plugins: {
     await cargarRankingMensual();
     await cargarTop20General();
     await cargarRankingContinentes();
+    await cargarMejoresMarcas();
   });
 
 async function editarAlias() {
@@ -2986,6 +3303,7 @@ async function editarAlias() {
   await cargarRankingMensual();
   await cargarTop20General();
   await cargarRankingContinentes();
+  await cargarMejoresMarcas();  
 
   alert("Alias actualizado correctamente.");
 }
@@ -3005,7 +3323,8 @@ function mostrarSeccionInicio(seccion) {
     semana: "seccionSemana",
     mes: "seccionMes",
     top20: "seccionTop20",
-    continentes: "seccionContinentes"
+    continentes: "seccionContinentes",
+    mejoresMarcas: "seccionMejoresMarcas"
   };
 
 const botones = {
@@ -3013,7 +3332,8 @@ const botones = {
   semana: "btnSemana",
   mes: "btnMes",
   top20: "btnTop20",
-  continentes: "btnContinentes"
+  continentes: "btnContinentes",
+  mejoresMarcas: "seccionMejoresMarcas"
 };
 
 Object.values(botones).forEach(id => {
@@ -3063,6 +3383,10 @@ document
 document
   .getElementById("btnContinentes")
   .addEventListener("click", () => mostrarSeccionInicio("continentes"));
+
+document
+  .getElementById("btnMejoresMarcas")
+  .addEventListener("click", () => mostrarSeccionInicio("mejoresMarcas"));
   
 document
   .getElementById("logoutButton")
@@ -3100,6 +3424,9 @@ async function iniciarApp() {
   await cargarTop20General();
 
   await cargarRankingContinentes();
+
+  await cargarMejoresMarcas();
+  
 }
   
 async function comprobarSesion() {
