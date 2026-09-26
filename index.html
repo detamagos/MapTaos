@@ -2046,8 +2046,7 @@ contenedor.innerHTML =
           <div
           class="${indice >= 5 ? `extra-${claveContinente}` : ""}"
           style="
-            ${indice >= 5 ? "display:none;" : ""}
-            display:flex;
+            display:${indice >= 5 ? "none" : "flex"};
             justify-content:space-between;
             align-items:center;
             padding:7px 0;
@@ -2135,8 +2134,10 @@ contenedor.innerHTML =
       style="
         margin-top:8px;
         width:100%;
-        border:none;
-        background:transparent;
+        padding:7px;
+        border:1px solid #ccc;
+        border-radius:8px;
+        background:#e1e4e6;
         font-weight:600;
         cursor:pointer;
       "
@@ -2988,10 +2989,11 @@ const botones = {
 Object.values(botones).forEach(id => {
   const boton = document.getElementById(id);
 
-  if (boton) {
-    boton.style.background = "#f1f1f1";
-    boton.style.color = "#111";
-  }
+if (boton) {
+  boton.style.background = "#e1e4e6";
+  boton.style.color = "#111";
+  boton.style.border = "1px solid #c5c9cc";
+}
 });
 
 const botonActivo =
@@ -3000,6 +3002,7 @@ const botonActivo =
 if (botonActivo) {
   botonActivo.style.background = "#111";
   botonActivo.style.color = "#fff";
+  botonActivo.style.border = "1px solid #111";
 }
   
   Object.values(secciones).forEach(id => {
